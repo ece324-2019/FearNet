@@ -7,11 +7,16 @@ class Baseline(nn.Module):
         super(Baseline, self).__init__()
         self.size = size
         # First convolutional layer: 50 3x3 kernels
+        # 64x64x3 -> 62x62x50
         self.conv1 = nn.Conv2d(3,50,3)
+        # First max pooling layer: 2x2 w/ stride = 2
+        # 31x31x50
+        self.pool = nn.MaxPool2d(2, 2)
         # Second convolutional layer: 50 5x5 kernels
+        # 29x29x50
         self.conv2 = nn.Conv2d(50,50,5)
-        # 2x2 Max Pooling w/ Stride = 2
-        self.pool = nn.MaxPool2d(2,2)
+        # Second max pooling layer: 2x2 w/ stride = 2 w/ padding
+        #
         # Batch Normalization on convolutional layers
         self.conv_BN = nn.BatchNorm2d(50)
         # Fully connected output layer
