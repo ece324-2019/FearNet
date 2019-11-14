@@ -28,3 +28,10 @@ class Baseline(nn.Module):
         # Fully connected output
         x = F.sigmoid(self.fc1_BN(self.fc1(x)))
         return x
+
+class DCNN(nn.Module):
+    def __init__(self, size):
+        super(DCNN, self).__init__()
+
+    def forward(self,x):
+        return x
