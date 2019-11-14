@@ -96,10 +96,10 @@ bs = 32
 e_num = 1
 trainloader = DataLoader(train, shuffle=True, batch_size=bs,pin_memory=False)
 valloader = DataLoader(valid,shuffle=True,batch_size=len(Y_test),pin_memory=False)
-#
+
 #
 # torch.manual_seed(1)
-net = Baseline()
+net = Baseline(64)
 # summary(net,(3,56,56))
 criterion = nn.BCEWithLogitsLoss
 optimizer = optim.Adam(net.parameters(), lr=0.001)
@@ -114,14 +114,15 @@ optimizer = optim.Adam(net.parameters(), lr=0.001)
 # start = time.time()
 for epoch in range(e_num):
     running_loss = 0
-    for i, data in enumerate(trainloader,0)
+    for i, data in enumerate(trainloader,0):
         j += 1
         inputs, labels = data
         optimizer.zero_grad()
         outputs = net(inputs)
-        loss =  criterion(outputs.squeeze(),???)
-        loss.backward()
-        optimizer.step()
+        print('batch label',labels)
+        # loss =  criterion(outputs.squeeze(),???)
+        # loss.backward()
+        # optimizer.step()
 #
 #         if j%per_epoch == 0:
             # print and append loss/acc stuff
