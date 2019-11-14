@@ -50,11 +50,18 @@ Ch3SD = Ch3SD/len(AllImages)
 
 print(Ch1Mean, "\n", Ch1SD, "\n", Ch2Mean, "\n", Ch2SD, "\n", Ch3Mean, "\n", Ch3SD)
 
-transform = transforms.Compose([Image.open().resize((64,64)),transforms.ToTensor(),transforms.Normalize((Ch1Mean.item(),Ch2Mean.item(),Ch3Mean.item()),(Ch1SD.item(),Ch2SD.item(),Ch3SD.item()))])
+transform = transforms.Compose(
+    [Image.open().resize((64,64)),
+     transforms.ToTensor(),transforms.Normalize(
+        (Ch1Mean.item(),Ch2Mean.item(),Ch3Mean.item()),
+        (Ch1SD.item(),Ch2SD.item(),Ch3SD.item())
+     )
+    ]
+)
 
 AllImages = torchvision.datasets.ImageFolder(root='.',transform=transform)
 
-AllImagesLoader = torch.utils.data.DataLoader(AllImages, batch_size=4, shuffle=True, num_workers=2)
+AllImagesLoader = torch.utils.data.DataLoader(AllImages, batch_size=4, shuffle=True, num_workers=4)
 
 dataiter = iter(AllImagesLoader)
 images, labels = dataiter.next()
