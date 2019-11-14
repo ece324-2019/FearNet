@@ -16,20 +16,25 @@ class Baseline(nn.Module):
         # 29x29x50
         self.conv2 = nn.Conv2d(50,50,5)
         # Second max pooling layer: 2x2 w/ stride = 2 w/ padding
-        #
+        # 13x13x50
         # Batch Normalization on convolutional layers
         self.conv_BN = nn.BatchNorm2d(50)
         # Fully connected output layer
-        self.fc1 = nn.Linear(128, 1)
+        # First layer = 1x8450 input
+        self.fc1 = nn.Linear(8450, 3)
         # Fully connected batch normalization
-        self.fc1_BN = nn.BatchNorm1d(128)
+        self.fc1_BN = nn.BatchNorm1d(3)
 
 
     def forward(self,x):
+
         # Convolution, Batch Normalization, and Pooling
         x = self.pool(F.relu(self.conv_BN(self.conv1(x))))
         x = self.pool(F.relu(self.conv_BN(self.conv2(x))))
-        x = x.view(-1,self.size**2)
+
+        # print('post',x.size())
+        x = x.view(-1,8450)
+        # print(x.size())
         # Fully connected output
         x = F.sigmoid(self.fc1_BN(self.fc1(x)))
         return x
