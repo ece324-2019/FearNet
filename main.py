@@ -61,7 +61,7 @@ Ch3Mean = 0.4512
 Ch3SD = 2778.6946/12735
 if torch.cuda.is_available():
     torch.set_default_tensor_type(torch.cuda.FloatTensor)
-transform = transforms.Compose([transforms.Resize((256,256)),transforms.ToTensor(),transforms.Normalize((Ch1Mean,Ch2Mean,Ch3Mean),(Ch1SD,Ch2SD,Ch3SD))])
+transform = transforms.Compose([transforms.Resize((128,128)),transforms.ToTensor(),transforms.Normalize((Ch1Mean,Ch2Mean,Ch3Mean),(Ch1SD,Ch2SD,Ch3SD))])
 
 image_data = torchvision.datasets.ImageFolder(root='.',transform=transform)
 
