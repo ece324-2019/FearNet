@@ -8,7 +8,7 @@ import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
 
-from torchsummary import summary
+#from torchsummary import summary
 
 import matplotlib.pyplot as plt
 import numpy as np
