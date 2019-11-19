@@ -88,7 +88,7 @@ labelohe = dfOneHot.to_numpy()
 
 # print('label',labelohe)
 # print('img',img_col)
-X_trval, X_test, Y_trval, Y_test= train_test_split(img_col,labelohe, test_size=0.9)
+X_trval, X_test, Y_trval, Y_test= train_test_split(img_col,labelohe, test_size=0.2)
 X_train, X_val, Y_train, Y_val = train_test_split(X_trval,Y_trval,test_size=0.2)
 
 train = DataClass(X_train,Y_train)
