@@ -48,7 +48,7 @@ class DCNN(nn.Module):
         self.conv2 = nn.Conv2d(50, 50, 5)
         self.conv_BN = nn.BatchNorm2d(50)
 
-        self.fc1 = nn.Linear(42050, 512)
+        self.fc1 = nn.Linear(800, 512)
         self.fc2 = nn.Linear(512,19)
         # self.fc3 = nn.Linear(64,19)
 
@@ -62,7 +62,7 @@ class DCNN(nn.Module):
         z = self.pool(F.relu(self.conv_BN(self.conv2(z))))
         z = self.pool(F.relu(self.conv_BN(self.conv2(z))))
         z = self.pool(F.relu(self.conv_BN(self.conv2(z))))
-        z = z.view(-1, 42050)
+        z = z.view(-1, 800)
         z = F.relu(self.fc1_BN(self.fc1(z)))
         z = F.sigmoid(self.fc2_BN(self.fc2(z)))
 
@@ -70,7 +70,7 @@ class DCNN(nn.Module):
         y = self.pool(F.relu(self.conv_BN(self.conv2(y))))
         y = self.pool(F.relu(self.conv_BN(self.conv2(y))))
         y = self.pool(F.relu(self.conv_BN(self.conv2(y))))
-        y = y.view(-1, 42050)
+        y = y.view(-1, 800)
         y = F.sigmoid(self.fc1_BN(self.fc1(y)))
         y = F.sigmoid(self.fc2_BN(self.fc2(y)))
 
@@ -78,7 +78,7 @@ class DCNN(nn.Module):
         w = self.pool(F.relu(self.conv_BN(self.conv2(w))))
         w = self.pool(F.relu(self.conv_BN(self.conv2(w))))
         w = self.pool(F.relu(self.conv_BN(self.conv2(w))))
-        w = w.view(-1, 42050)
+        w = w.view(-1, 800)
         w = F.sigmoid(self.fc1_BN(self.fc1(w)))
         w = F.sigmoid(self.fc2_BN(self.fc2(w)))
 
