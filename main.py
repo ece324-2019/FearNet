@@ -18,7 +18,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 from PIL import Image
 from dataclass import DataClass
-from models import Baseline
+from models import Baseline, DCNN
 from metrics import accuracy, evaluate
 # --- CALCULATING IMAGE CHANNEL MEANS AND STANDARD DEVIATIONS---
 # transform = transforms.Compose([transforms.ToTensor()])
@@ -51,7 +51,7 @@ from metrics import accuracy, evaluate
 # Ch3Mean = Ch3Mean/len(AllImages)
 # Ch3SD = Ch3SD/len(AllImages)
 # print('Ch1',Ch1SD,'Ch2',Ch2SD,'Ch3',Ch3SD)
-#
+torch.cuda.empty_cache()
 # print(Ch1Mean, "\n", Ch1SD, "\n", Ch2Mean, "\n", Ch2SD, "\n", Ch3Mean, "\n", Ch3SD)
 Ch1Mean = 0.4882
 Ch1SD = 2850.2090/12735
@@ -59,10 +59,11 @@ Ch2Mean = 0.4723
 Ch2SD = 2754.8560/12735
 Ch3Mean = 0.4512
 Ch3SD = 2778.6946/12735
+if torch.cuda.is_available():
+    torch.set_default_tensor_type(torch.cuda.FloatTensor)
+transform = transforms.Compose([transforms.Resize((128,128)),transforms.ToTensor(),transforms.Normalize((Ch1Mean,Ch2Mean,Ch3Mean),(Ch1SD,Ch2SD,Ch3SD))])
 
-transform = transforms.Compose([transforms.Resize((64,64)),transforms.ToTensor(),transforms.Normalize((Ch1Mean,Ch2Mean,Ch3Mean),(Ch1SD,Ch2SD,Ch3SD))])
-
-image_data = torchvision.datasets.ImageFolder(root='./data',transform=transform)
+image_data = torchvision.datasets.ImageFolder(root='.',transform=transform)
 
 # imgloader = torch.utils.data.DataLoader(image_data, batch_size=4, shuffle=True, num_workers=4)
 
@@ -87,22 +88,26 @@ labelohe = dfOneHot.to_numpy()
 
 # print('label',labelohe)
 # print('img',img_col)
-X_train, X_test, Y_train, Y_test = train_test_split(img_col,labelohe, test_size=0.2)
+X_trval, X_test, Y_trval, Y_test= train_test_split(img_col,labelohe, test_size=0.9)
+X_train, X_val, Y_train, Y_val = train_test_split(X_trval,Y_trval,test_size=0.2)
 
 train = DataClass(X_train,Y_train)
-valid = DataClass(X_test,Y_test)
+valid = DataClass(X_val,Y_val)
+test = DataClass(X_test,Y_test)
 
-bs = 32
-e_num = 20
+bs = 2
+e_num = 10
 trainloader = DataLoader(train, shuffle=True, batch_size=bs,pin_memory=False)
 valloader = DataLoader(valid,shuffle=True,batch_size=len(Y_test),pin_memory=False)
 
-#
-# torch.manual_seed(1)
-net = Baseline(64)
+
+torch.manual_seed(1)
+# net = Baseline(1)
+net = DCNN()
+net = net.train()
 # summary(net,(3,56,56))
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(net.parameters(), lr=0.001)
+optimizer = optim.Adam(net.parameters(), lr=0.01)
 #
 
 val_acc_tot = []
@@ -110,86 +115,80 @@ train_acc_tot = []
 loss_tot = []
 val_loss_tot = []
 n_tot = []
-j=0
-step=10
+step=25
+j = 0
 for epoch in range(e_num):
-    print('Epoch #: ', epoch)
-
+    net = net.train()
     sum_loss = 0
     running_loss = 0
-    net = net.train()
+    batchperepoch = 0
     for i, data in enumerate(trainloader,0):
+        batchperepoch += 1
         j += 1
+        print('Epoch #: ', epoch)
+        print('Batch #: ', j)
         inputs, labels = data
         optimizer.zero_grad()
         outputs = net(inputs)
         # print('batch label',labels)
-        loss =  criterion(outputs.squeeze(),torch.max(labels,1)[1])
+        # print('batch_label long',labels.long())
+        loss =  criterion(outputs.squeeze(),torch.max(labels.long(),1)[1])
         loss.backward()
         optimizer.step()
-#
-        if j%step== 0:
-            net.eval()
-            loss_tot.append(running_loss / step)
-            train_acc_tot.append(accuracy(outputs, labels)[0])
-            # acc_tot.append(acc[0])
-            n_tot.append(j)
-            running_loss = 0
-            temp = evaluate(net, valloader)
-            val_loss_tot.append(temp[1])
-            val_acc_tot.append(temp[0])
-            print('Validation Acc ', temp[0])
-            print('Train Acc ', accuracy(outputs, labels)[0])
-            # net = net.eval()
-            # n_vec.append(e_num)
-            # print('epoch #: ', e_num)
-            # print('train_loss:', sum_loss / j)
-            # train_loss_vec.append(sum_loss / j)
-            # # Baseline/CNN/RNN
-            # tacc = accuracy(torch.sigmoid(outputs.squeeze()), batch_label.float())
-            # # OTHER
-            # # tacc = accuracy(outputs, batch_label)
-            # train_acc_vec.append(tacc[0])
-            # print('train_acc:', tacc[0])
-            # eval = evaluate(net, val_iter)
-            # val_acc_vec.append(eval[0])
-            # val_loss_vec.append(eval[1])
-            # print('val_acc:', eval[0])
-            # print('val_loss:', eval[1])
-            # test = evaluate(net, test_iter)
-            # test_acc_vec.append(test[0])
-            # test_loss_vec.append(test[1])
-            # print('test_acc', test[0])
-            # print('test_loss', test[1])
-    # plt.plot(n_vec, train_loss_vec, label='Training Loss')
-    # plt.plot(n_vec, train_acc_vec, label='Training Acc.')
-    # plt.plot(n_vec, val_loss_vec, label='Val. Loss')
-    # plt.plot(n_vec, val_acc_vec, label='Val. Acc.')
-    # plt.plot(n_vec, test_loss_vec, label='Test. Loss')
-    # plt.plot(n_vec, test_acc_vec, label='Test. Acc.')
-    #
-    # plt.title('Training/Validation/Test Loss & Accuracy v.s. epoch')
-    # plt.xlabel('epoch')
-    # plt.ylabel('loss/accuracy')
-    # plt.legend()
-    # plt.show()
+        running_loss += loss.detach()
+
+    # if j%step== 0:
+    # if epoch%1 == epoch:
+    net = net.eval()
+    print(running_loss/batchperepoch)
+    loss_tot.append(running_loss/batchperepoch)
+    t_acc = accuracy(outputs,labels)[0]
+    train_acc_tot.append(t_acc)
+    # acc_tot.append(acc[0])
+    n_tot.append(epoch)
+    running_loss = 0
+    temp = evaluate(net, valloader)
+    val_loss_tot.append(temp[1])
+    val_acc_tot.append(temp[0])
+    print('Train Acc ', t_acc)
+    print('Validation Acc ', temp[0])
+    print('Train Loss', running_loss/batchperepoch)
+    print('Validation Loss', temp[1])
+
 print('Finished Training')
 # print('Time Elapsed: ', end - start, 's')
 plt.plot(n_tot, train_acc_tot, label='Training Accuracy')
 plt.plot(n_tot, val_acc_tot, label='Validation Accuracy')
 # plt.plot(loss_tot, label='Validation')
-plt.title('Training and Validation Accuracy v.s. mini-batch')
-plt.xlabel('mini-batch')
+plt.title('Training and Validation Accuracy v.s. epoch')
+plt.xlabel('epoch')
 plt.ylabel('accuracy')
 plt.legend()
 plt.show()
 
 plt.plot(n_tot, loss_tot, label='Training Loss')
 plt.plot(n_tot, val_loss_tot, label='Validation Loss')
-plt.title('Training and Validation Loss v.s. mini-batch')
-plt.xlabel('mini-batch')
+plt.title('Training and Validation Loss v.s. epoch')
+plt.xlabel('epoch')
+
+
 plt.ylabel('loss')
 plt.legend()
 plt.show()
 
 # plot loss/acc stuff
+y_ground = []
+y_pred = []
+for j, batch in enumerate(valloader, 1):
+    valid_train, valid_label = batch
+    predict = net(valid_train.float())
+    predictions = predict.detach()
+    index = 0
+    for pred in predictions:
+        p_val, p_clas = torch.max(pred, 0)
+        v_val, v_clas = torch.max(valid_label[index], 0)
+        y_pred.append(p_clas.item())
+        y_ground.append(v_clas.item())
+        index += 1
+
+print(confusion_matrix(y_ground,y_pred))
