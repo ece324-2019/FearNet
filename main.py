@@ -95,8 +95,8 @@ train = DataClass(X_train,Y_train)
 valid = DataClass(X_val,Y_val)
 test = DataClass(X_test,Y_test)
 
-bs = 2
-e_num = 10
+bs = 64
+e_num = 25
 trainloader = DataLoader(train, shuffle=True, batch_size=bs,pin_memory=False)
 valloader = DataLoader(valid,shuffle=True,batch_size=len(Y_test),pin_memory=False)
 
