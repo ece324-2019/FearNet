@@ -93,10 +93,12 @@ class resnet152(nn.Module):
         for param in self.model.parameters():
             param.requires_grad = False
         num_ftrs = self.model.fc.in_features
-        self.model.fc = nn.Linear(num_ftrs,18)
+        print(num_ftrs)
+        self.model.fc = nn.Linear(num_ftrs,1024)
+        self.fc2 = nn.Linear(1024,18)
 
     def forward(self,x):
-        x = self.model(x)
+        x = self.fc2(self.model(x))
         return x
 
 class avgTransferEnsemble(nn.Module):
