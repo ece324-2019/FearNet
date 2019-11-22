@@ -1,6 +1,8 @@
 # FearNet
 
-Performance Results (as Validation Accuracy):
+Goal:
+
+Notes:
 
 Hyper Params: LR = 0.001, Epoch = 20, Batch Size = 64
 -----------------------------------------------------
