@@ -96,9 +96,9 @@ valid = DataClass(X_val,Y_val)
 test = DataClass(X_test,Y_test)
 
 bs = 64
-e_num = 25
+e_num = 20
 trainloader = DataLoader(train, shuffle=True, batch_size=bs,pin_memory=False)
-valloader = DataLoader(valid,shuffle=True,batch_size=len(Y_test),pin_memory=False)
+valloader = DataLoader(valid,shuffle=True,batch_size=bs,pin_memory=False)
 
 
 torch.manual_seed(1)
@@ -107,7 +107,7 @@ net = DCNN()
 net = net.train()
 # summary(net,(3,56,56))
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(net.parameters(), lr=0.01)
+optimizer = optim.Adam(net.parameters(), lr=0.001)
 #
 
 val_acc_tot = []
