@@ -104,6 +104,28 @@ class resnet152(nn.Module):
         x = self.fc3(x)
         return x
 
+class vgg19bn(nn.Module):
+    def __init__(self):
+        super(vgg19bn, self).__init__()
+        self.model = models.vgg19_bn(pretrained=True)
+        for param in self.model.parameters():
+            param.requires_grad = False
+        num_ftrs = self.model.classifier[6].in_features
+        # Convert all vgg19_bn layers to list and remove last one
+        features = list(self.model.classifier.children())[:-1]
+        # Add the last layer based on the num of classes in our dataset
+        features.extend([nn.Linear(num_ftrs, 18)])
+        self.model = nn.Sequential(*features)
+        # self.fc2 = nn.Linear(2048,18)
+        # self.fc3 = nn.Linear(512,18)
+
+    def forward(self,x):
+        x = self.model(x)
+        # x = F.relu(self.model(x))
+        # x = F.relu(self.fc2(x))
+        # x = self.fc3(x)
+        return x
+
 class avgTransferEnsemble(nn.Module):
     def __init__(self):
         super(avgTransferEnsemble, self).__init__()
@@ -129,7 +151,6 @@ class avgTransferEnsemble(nn.Module):
         features = list(self.vgg19bn.classifier.children())[:-1]
         # Add the last layer based on the num of classes in our dataset
         features.extend([nn.Linear(n2, 18)])
-        # convert it into container and add it to our model class.
         # Replacing last fc layer for all transfer models
         self.res152.fc = nn.Linear(n1, 18)
         self.vgg19bn = nn.Sequential(*features)
