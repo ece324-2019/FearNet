@@ -115,7 +115,7 @@ train_acc_tot = []
 loss_tot = []
 val_loss_tot = []
 n_tot = []
-step=25
+step=20
 j = 0
 for epoch in range(e_num):
     net = net.train()

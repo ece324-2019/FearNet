@@ -2,8 +2,10 @@ import torch
 import torch.nn as nn
 
 def accuracy(predictions, label):
-    print(predictions)
-    predictions = nn.Sigmoid(predictions).detach()
+    # print(predictions.size())
+    sig = nn.Sigmoid()
+    predictions = sig(predictions)
+    predictions = predictions.detach()
     total_corr = 0
     index = 0
     for pred in predictions:
