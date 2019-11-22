@@ -159,6 +159,8 @@ for epoch in range(e_num):
     print('Validation Loss', temp[1])
 
 print('Finished Training')
+print('Train Acc: ', train_acc_tot)
+print('Val Acc: ', val_acc_tot)
 # print('Time Elapsed: ', end - start, 's')
 plt.plot(n_tot, train_acc_tot, label='Training Accuracy')
 plt.plot(n_tot, val_acc_tot, label='Validation Accuracy')

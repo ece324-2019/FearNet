@@ -109,15 +109,25 @@ class avgTransferEnsemble(nn.Module):
         self.wres101 = models.wide_resnet101_2(pretrained=True)
         self.resnext50 = models.resnext101_32x8d(pretrained=True)
 
+        # Freezing
+
+        # Finding size of last layer
         n1 = self.res152.fc.in_features
-        n2 = self.vgg19bn.fc.in_features
+        n2 = self.vgg19bn.classifier[6].in_features
         n3 = self.dense161.fc.in_features
         n4 = self.inceptv3.fc.in_features
         n5 = self.wres101.fc.in_features
         n6 = self.resnext50.fc.in_features
 
-        self.res152.fc = nn.Linear(n1,18)
-        self.vgg19bn.fc = nn.Linear(n2, 18)
+        # Some syntax to prep vgg19_bn for last fc layer replacement
+        # Convert all vgg19_bn layers to list and remove last one
+        features = list(self.vgg19bn.classifier.children())[:-1]
+        # Add the last layer based on the num of classes in our dataset
+        features.extend([nn.Linear(n2, 18)])
+        # convert it into container and add it to our model class.
+        # Replacing last fc layer for all transfer models
+        self.res152.fc = nn.Linear(n1, 18)
+        self.vgg19bn = nn.Sequential(*features)
         self.dense161.fc = nn.Linear(n3, 18)
         self.inceptv3.fc = nn.Linear(n4, 18)
         self.wres101.fc = nn.Linear(n5, 18)
