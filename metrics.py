@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 def accuracy(predictions, label):
-    # print(predictions.size())
+    # print(label.size())
     sig = nn.Sigmoid()
     predictions = sig(predictions)
     predictions = predictions.detach()

@@ -6,6 +6,7 @@ import torch.utils.data as data
 import torch.optim as optim
 
 import torchvision
+from torchvision import models
 import torchvision.transforms as transforms
 
 #from torchsummary import summary
@@ -18,7 +19,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 from PIL import Image
 from dataclass import DataClass
-from models import Baseline, DCNN
+from models import Baseline, DCNNEnsemble_3, resnet152
 from metrics import accuracy, evaluate
 # --- CALCULATING IMAGE CHANNEL MEANS AND STANDARD DEVIATIONS---
 # transform = transforms.Compose([transforms.ToTensor()])
@@ -63,7 +64,7 @@ if torch.cuda.is_available():
     torch.set_default_tensor_type(torch.cuda.FloatTensor)
 transform = transforms.Compose([transforms.Resize((128,128)),transforms.ToTensor(),transforms.Normalize((Ch1Mean,Ch2Mean,Ch3Mean),(Ch1SD,Ch2SD,Ch3SD))])
 
-image_data = torchvision.datasets.ImageFolder(root='.',transform=transform)
+image_data = torchvision.datasets.ImageFolder(root='./data',transform=transform)
 
 # imgloader = torch.utils.data.DataLoader(image_data, batch_size=4, shuffle=True, num_workers=4)
 
@@ -103,7 +104,8 @@ valloader = DataLoader(valid,shuffle=True,batch_size=bs,pin_memory=False)
 
 torch.manual_seed(1)
 # net = Baseline(1)
-net = DCNN()
+net = DCNNEnsemble_3()
+# net = resnet152()
 net = net.train()
 # summary(net,(3,56,56))
 criterion = nn.CrossEntropyLoss()

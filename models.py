@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torchvision import models
 
 class Baseline(nn.Module):
     def __init__(self):
@@ -21,9 +22,9 @@ class Baseline(nn.Module):
         self.conv_BN = nn.BatchNorm2d(50)
         # Fully connected output layer
         # First layer = 1x8450 input
-        self.fc1 = nn.Linear(42050, 19)
+        self.fc1 = nn.Linear(42050, 18)
         # Fully connected batch normalization
-        self.fc1_BN = nn.BatchNorm1d(19)
+        self.fc1_BN = nn.BatchNorm1d(18)
 
 
     def forward(self,x):
@@ -39,9 +40,9 @@ class Baseline(nn.Module):
         x = F.sigmoid(self.fc1_BN(self.fc1(x)))
         return x
 
-class DCNN(nn.Module):
+class DCNNEnsemble_3(nn.Module):
     def __init__(self):
-        super(DCNN, self).__init__()
+        super(DCNNEnsemble_3, self).__init__()
         # self.size = size
         self.conv1 = nn.Conv2d(3, 50, 3)
         self.pool = nn.MaxPool2d(2, 2)
@@ -49,12 +50,12 @@ class DCNN(nn.Module):
         self.conv_BN = nn.BatchNorm2d(50)
 
         self.fc1 = nn.Linear(42050, 512)
-        self.fc2 = nn.Linear(512,19)
-        # self.fc3 = nn.Linear(64,19)
+        self.fc2 = nn.Linear(512,18)
+        # self.fc3 = nn.Linear(64,18)
 
         self.fc1_BN = nn.BatchNorm1d(512)
-        self.fc2_BN = nn.BatchNorm1d(19)
-        # self.fc3_BN = nn.BatchNorm1d(19)
+        self.fc2_BN = nn.BatchNorm1d(18)
+        # self.fc3_BN = nn.BatchNorm1d(18)
 
 
     def forward(self,x):
@@ -84,3 +85,15 @@ class DCNN(nn.Module):
 
         x = (z+y+w)/3
         return x
+
+class resnet152(nn.Module):
+    def __init__(self):
+        super(resnet152, self).__init__()
+        self.model = models.resnet152(pretrained=True)
+        num_ftrs = self.model.fc.in_features
+        self.model.fc = nn.Linear(num_ftrs,18)
+
+    def forward(self,x):
+        x = self.model(x)
+        return x
+
