@@ -95,10 +95,13 @@ class resnet152(nn.Module):
         num_ftrs = self.model.fc.in_features
         print(num_ftrs)
         self.model.fc = nn.Linear(num_ftrs,1024)
-        self.fc2 = nn.Linear(1024,18)
+        self.fc2 = nn.Linear(1024,512)
+        self.fc3 = nn.Linear(512,18)
 
     def forward(self,x):
-        x = self.fc2(self.model(x))
+        x = F.relu(self.model(x))
+        x = F.relu(self.fc2(x))
+        x = self.fc3(x)
         return x
 
 class avgTransferEnsemble(nn.Module):
