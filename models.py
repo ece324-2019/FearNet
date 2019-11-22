@@ -97,3 +97,37 @@ class resnet152(nn.Module):
         x = self.model(x)
         return x
 
+class avgTransferEnsemble(nn.Module):
+    def __init__(self):
+        super(avgTransferEnsemble, self).__init__()
+        self.res152 = models.resnet152(pretrained=True)
+        self.vgg19bn = models.vgg19_bn(pretrained=True)
+        self.dense161 = models.densenet161(pretrained=True)
+        self.inceptv3 = models.inception_v3(pretrained=True)
+        self.wres101 = models.wide_resnet101_2(pretrained=True)
+        self.resnext50 = models.resnext101_32x8d(pretrained=True)
+
+        n1 = self.res152.fc.in_features
+        n2 = self.vgg19bn.fc.in_features
+        n3 = self.dense161.fc.in_features
+        n4 = self.inceptv3.fc.in_features
+        n5 = self.wres101.fc.in_features
+        n6 = self.resnext50.fc.in_features
+
+        self.res152.fc = nn.Linear(n1,18)
+        self.vgg19bn.fc = nn.Linear(n2, 18)
+        self.dense161.fc = nn.Linear(n3, 18)
+        self.inceptv3.fc = nn.Linear(n4, 18)
+        self.wres101.fc = nn.Linear(n5, 18)
+        self.resnext50.fc = nn.Linear(n6, 18)
+
+    def forward(self,x):
+        x1 = self.res152(x)
+        x2 = self.vgg19bn(x)
+        x3 = self.dense161(x)
+        x4 = self.inceptv3(x)
+        x5 = self.wres101(x)
+        x6 = self.resnext50(x)
+
+        z = (x1+x2+x3+x4+x5+x6)/6
+        return z
