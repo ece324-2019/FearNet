@@ -111,11 +111,10 @@ class vgg19bn(nn.Module):
         for param in self.model.parameters():
             param.requires_grad = False
         num_ftrs = self.model.classifier[6].in_features
-        # Convert all vgg19_bn layers to list and remove last one
-        features = list(self.model.classifier.children())[:-1]
-        # Add the last layer based on the num of classes in our dataset
-        features.extend([nn.Linear(num_ftrs, 18)])
-        self.model = nn.Sequential(*features)
+        old = list(self.model.classifier.children())
+        old.pop()
+        old.append(nn.Linear(num_ftrs,18))
+        self.model.classifier = nn.Sequential(*old)
         # self.fc2 = nn.Linear(2048,18)
         # self.fc3 = nn.Linear(512,18)
 
