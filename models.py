@@ -131,13 +131,13 @@ class dense161(nn.Module):
         for param in self.model.parameters():
             param.requires_grad = False
         num_ftrs = self.model.classifier.in_features
-        self.model.classifier = nn.Linear(num_ftrs,18)
-        # self.fc2 = nn.Linear(1104, 18)
+        self.model.classifier = nn.Linear(num_ftrs,1104)
+        self.fc2 = nn.Linear(1104, 18)
         # self.fc3 = nn.Linear(552,18)
 
     def forward(self, x):
         x = F.relu(self.model(x))
-        # x = self.fc2(x)
+        x = self.fc2(x)
         # x = self.fc3(x)
         return x
 
