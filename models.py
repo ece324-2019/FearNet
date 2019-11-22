@@ -90,6 +90,8 @@ class resnet152(nn.Module):
     def __init__(self):
         super(resnet152, self).__init__()
         self.model = models.resnet152(pretrained=True)
+        for param in self.model.parameters():
+            param.requires_grad = False
         num_ftrs = self.model.fc.in_features
         self.model.fc = nn.Linear(num_ftrs,18)
 
