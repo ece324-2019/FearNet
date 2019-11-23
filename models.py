@@ -144,7 +144,7 @@ class dense161(nn.Module):
 class resnext101(nn.Module):
     def __init__(self):
         super(resnext101, self).__init__()
-        self.model = models.resnext101_64xd(pretrained=True)
+        self.model = models.resnext101_32x8d(pretrained=True)
         for param in self.model.parameters():
             param.requires_grad = False
         num_ftrs = self.model.fc.in_features
@@ -156,11 +156,8 @@ class resnext101(nn.Module):
 
         return x
 
-
-        
-
 # Inception is not used because it requires certain conditions in data loading and output compiling.
-#class inceptionv3(nn.Module):
+# class inceptionv3(nn.Module):
 #    def __init__(self):
 #        super(inceptionv3, self).__init__()
 #        self.model = models.inception_v3(pretrained=True)
