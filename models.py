@@ -133,31 +133,49 @@ class dense161(nn.Module):
         num_ftrs = self.model.classifier.in_features
         self.model.classifier = nn.Linear(num_ftrs,1104)
         self.fc2 = nn.Linear(1104, 18)
-        # self.fc3 = nn.Linear(552,18)
+        #self.fc3 = nn.Linear(552,18)
 
     def forward(self, x):
         x = F.relu(self.model(x))
+        #x = F.relu(self.fc2(x))
         x = self.fc2(x)
-        # x = self.fc3(x)
         return x
 
-
-class inceptionv3(nn.Module):
+class resnext101(nn.Module):
     def __init__(self):
-        super(inceptionv3, self).__init__()
-        self.model = models.inception_v3(pretrained=True)
+        super(resnext101, self).__init__()
+        self.model = models.resnext101_64xd(pretrained=True)
         for param in self.model.parameters():
             param.requires_grad = False
         num_ftrs = self.model.fc.in_features
+        print(num_ftrs)
         self.model.fc = nn.Linear(num_ftrs,18)
-        # self.fc2 = nn.Linear(1024,512)
-        # self.fc3 = nn.Linear(512,18)
 
     def forward(self,x):
-        x = F.relu(self.model(x))
-        # x = F.relu(self.fc2(x))
-        # x = self.fc3(x)
+        x = self.model(x)
+
         return x
+
+
+        
+
+# Inception is not used because it requires certain conditions in data loading and output compiling.
+#class inceptionv3(nn.Module):
+#    def __init__(self):
+#        super(inceptionv3, self).__init__()
+#        self.model = models.inception_v3(pretrained=True)
+#        for param in self.model.parameters():
+#            param.requires_grad = False
+#        num_ftrs = self.model.fc.in_features
+#        self.model.fc = nn.Linear(num_ftrs,18)
+#        # self.fc2 = nn.Linear(1024,512)
+#        # self.fc3 = nn.Linear(512,18)
+#
+#    def forward(self,x):
+#        x = self.model(x)
+#        # x = F.relu(self.fc2(x))
+#        # x = self.fc3(x)
+#        return x
 
 
 class avgTransferEnsemble(nn.Module):
