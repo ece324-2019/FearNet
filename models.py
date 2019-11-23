@@ -179,32 +179,13 @@ class wres101(nn.Module):
         print(num_ftrs)
         self.model.fc = nn.Linear(num_ftrs,1024)
         self.fc2 = nn.Linear(1024,18)
-        self.bn1 = nn.BatchNorm1d(1024)
+        self.bn = nn.BatchNorm1d(1024)
         self.bn2 = nn.BatchNorm1d(18)
     def forward(self,x):
-        x = F.relu(self.model(x))
-        x = self.fc2(x)
+        x = F.relu(self.bn(self.model(x)))
+        x = self.bn2(self.fc2(x))
 
         return x
-
-# Inception is not used because it requires certain conditions in data loading and output compiling.
-# class inceptionv3(nn.Module):
-#    def __init__(self):
-#        super(inceptionv3, self).__init__()
-#        self.model = models.inception_v3(pretrained=True)
-#        for param in self.model.parameters():
-#            param.requires_grad = False
-#        num_ftrs = self.model.fc.in_features
-#        self.model.fc = nn.Linear(num_ftrs,18)
-#        # self.fc2 = nn.Linear(1024,512)
-#        # self.fc3 = nn.Linear(512,18)
-#
-#    def forward(self,x):
-#        x = self.model(x)
-#        # x = F.relu(self.fc2(x))
-#        # x = self.fc3(x)
-#        return x
-
 
 class avgTransferEnsemble(nn.Module):
     def __init__(self):
@@ -212,9 +193,8 @@ class avgTransferEnsemble(nn.Module):
         self.res152 = models.resnet152(pretrained=True)
         self.vgg19bn = models.vgg19_bn(pretrained=True)
         self.dense161 = models.densenet161(pretrained=True)
-        self.inceptv3 = models.inception_v3(pretrained=True)
         self.wres101 = models.wide_resnet101_2(pretrained=True)
-        self.resnext50 = models.resnext101_32x8d(pretrained=True)
+        self.resnext101 = models.resnext101_32x8d(pretrained=True)
 
         # Freezing
 
@@ -222,9 +202,8 @@ class avgTransferEnsemble(nn.Module):
         n1 = self.res152.fc.in_features
         n2 = self.vgg19bn.classifier[6].in_features
         n3 = self.dense161.fc.in_features
-        n4 = self.inceptv3.fc.in_features
         n5 = self.wres101.fc.in_features
-        n6 = self.resnext50.fc.in_features
+        n6 = self.resnext101.fc.in_features
 
         # Some syntax to prep vgg19_bn for last fc layer replacement
         # Convert all vgg19_bn layers to list and remove last one
