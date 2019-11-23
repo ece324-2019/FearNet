@@ -149,6 +149,24 @@ class resnext101(nn.Module):
             param.requires_grad = False
         num_ftrs = self.model.fc.in_features
         print(num_ftrs)
+        self.model.fc = nn.Linear(num_ftrs,1024)
+        self.fc2 = nn.Linear(1024,18)
+        # self.fc3 = nn.Linear(512,18)
+
+    def forward(self,x):
+        x = F.relu(self.model(x))
+        x = self.fc2(x)
+
+        return x
+
+class wres101(nn.Module):
+    def __init__(self):
+        super(wres101, self).__init__()
+        self.model = models.wide_resnet101_2(pretrained=True)
+        for param in self.model.parameters():
+            param.requires_grad = False
+        num_ftrs = self.model.fc.in_features
+        print(num_ftrs)
         self.model.fc = nn.Linear(num_ftrs,18)
 
     def forward(self,x):
