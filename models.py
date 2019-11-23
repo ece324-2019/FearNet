@@ -137,13 +137,14 @@ class alex(nn.Module):
         old.append(nn.Linear(num_ftrs,18))
         print(num_ftrs)
         self.model.classifier = nn.Sequential(*old)
-        # self.fc2 = nn.Linear(2048,18)
-        # self.fc3 = nn.Linear(1024,18)
+        # self.fc2 = nn.Linear(1024,18)
+        # self.bn = nn.BatchNorm1d(1024)
+        # self.bn2 = nn.BatchNorm1d(18)
 
     def forward(self,x):
         x = self.model(x)
-        # x = F.relu(self.model(x))
-        # x = self.fc2(x)
+        # x = F.relu(self.bn(self.model(x)))
+        # x = self.bn2(self.fc2(x))
         # x = self.fc3(x)
         return x
 
