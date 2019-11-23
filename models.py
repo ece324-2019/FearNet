@@ -125,6 +125,28 @@ class vgg19bn(nn.Module):
         # x = self.fc3(x)
         return x
 
+class alex(nn.Module):
+    def __init__(self):
+        super(alex, self).__init__()
+        self.model = models.alexnet(pretrained=True)
+        for param in self.model.parameters():
+            param.requires_grad = False
+        num_ftrs = self.model.classifier[6].in_features
+        old = list(self.model.classifier.children())
+        old.pop()
+        old.append(nn.Linear(num_ftrs,18))
+        print(num_ftrs)
+        self.model.classifier = nn.Sequential(*old)
+        # self.fc2 = nn.Linear(2048,18)
+        # self.fc3 = nn.Linear(1024,18)
+
+    def forward(self,x):
+        x = self.model(x)
+        # x = F.relu(self.model(x))
+        # x = self.fc2(x)
+        # x = self.fc3(x)
+        return x
+
 class dense161(nn.Module):
     def __init__(self):
         super(dense161, self).__init__()
