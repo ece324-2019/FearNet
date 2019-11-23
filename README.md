@@ -4,7 +4,7 @@ Goal:
 
 Notes:
 
-Hyper Params: 128x128img, LR = 0.001, Epoch = 20, Batch Size = 64, No BN (unless model inherent, i.e. VGG)
+Hyper Params: 128x128img, LR = 0.001, Epoch = 20, Batch Size = 64, No BN (unless model inherent, i.e. VGG)   
 -----------------------------------------------------
 Baseline: 13.67%   
 3-DCNN Ensemble: 14.48%   
