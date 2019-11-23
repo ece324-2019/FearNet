@@ -184,11 +184,24 @@ class resnext101(nn.Module):
         # self.bn2 = nn.BatchNorm1d(512)
         # self.bn3 = nn.BatchNorm1d(18)
 
+class google(nn.Module):
+    def __init__(self):
+        super(google, self).__init__()
+        self.model = models.googlenet(pretrained=True)
+        for param in self.model.parameters():
+            param.requires_grad = False
+        num_ftrs = self.model.fc.in_features
+        print(num_ftrs)
+        self.model.fc = nn.Linear(num_ftrs, 18)
+        # self.fc2 = nn.Linear(512, 18)
+        # self.bn1 = nn.BatchNorm1d(1024)
+        # self.bn2 = nn.BatchNorm1d(512)
+        # self.bn3 = nn.BatchNorm1d(18)
 
     def forward(self,x):
-        x = F.relu(self.model(x))
+        x = self.model(x)
         # x = self.bn2(self.fc2(x))
-        x = self.fc2(x)
+        # x = self.fc2(x)
 
         return x
 
