@@ -157,15 +157,15 @@ class resnext101(nn.Module):
         self.model.fc = nn.Linear(num_ftrs,1024)
         self.fc2 = nn.Linear(1024, 18)
         # self.fc3 = nn.Linear(512, 18)
-        self.bn1 = nn.BatchNorm1d(1024)
+        # self.bn1 = nn.BatchNorm1d(1024)
         # self.bn2 = nn.BatchNorm1d(512)
-        self.bn3 = nn.BatchNorm1d(18)
+        # self.bn3 = nn.BatchNorm1d(18)
 
 
     def forward(self,x):
-        x = F.relu(self.bn1(self.model(x)))
+        x = F.relu(self.model(x))
         # x = self.bn2(self.fc2(x))
-        x = self.bn3(self.fc2(x))
+        x = self.fc2(x)
 
         return x
 
