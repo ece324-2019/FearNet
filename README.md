@@ -15,13 +15,20 @@ VGG19_BN (1 unfrozen fc layer): ~73%
 VGG19_BN (1 unfrozen fc layer + 1 external fc layer): ~73-74%  
 Densenet161 (1 unfrozen fc layer): 75%  
 Densenet161 (1 unfrozen fc layer + 1 external fc layer): ~75-76%  
-Using Updated (Cleaned) Dataset (~5% overall val. acc. improvement)
+Using Updated (Cleaned) Dataset (~5% overall val. acc. improvement)  
 -----------------------------------------------------
+Densenet161 (1 unfrozen fc layer): ~79%    
 Densenet161 (1 unfrozen fc layer + 1 external fc layer): ~80-81%  
 Densenet161 (1 unfrozen fc layer + 2 external fc layer): ~80%  
 Resnext101 (1 unfrozen fc layer): ~78%   
-Resnext101 (1 unfrozen fc layer + 1 external fc layer): ~79-80%    
+Resnext101 (1 unfrozen fc layer + 1 external fc layer): ~78-79%    
 Resnext101 (1 unfrozen fc layer + 2 external fc layer): ~78-79%   
-W/ Batch Norm on modified linear layers (~2% overall val. acc. improvement)
+Wres101 (1 unfrozen fc layer): ~75%  
+Wres101 (1 unfrozen fc layer + 1 external fc layer): ~76%     
+
+W/ Batch Norm on modified linear layers (~2% overall val. acc. improvement)  
 --------------------------------------
+Densenet161 (1 unfrozen fc layer + 1 external fc layer): ~80.5%   
+Resnext101 (1 unfrozen fc layer + 1 external fc layer): ~80-81%   
 Resnext101 (1 unfrozen fc layer + 2 external fc layer): ~80-81%   
+Wres101 (1 unfrozen fc layer + 1 external fc layer): ~77%     
