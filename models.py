@@ -113,14 +113,15 @@ class vgg19bn(nn.Module):
         num_ftrs = self.model.classifier[6].in_features
         old = list(self.model.classifier.children())
         old.pop()
-        old.append(nn.Linear(num_ftrs,2048))
+        old.append(nn.Linear(num_ftrs,18))
         self.model.classifier = nn.Sequential(*old)
-        self.fc2 = nn.Linear(2048,18)
+        # self.fc2 = nn.Linear(2048,18)
         # self.fc3 = nn.Linear(1024,18)
 
     def forward(self,x):
-        x = F.relu(self.model(x))
-        x = self.fc2(x)
+        x = self.model(x)
+        # x = F.relu(self.model(x))
+        # x = self.fc2(x)
         # x = self.fc3(x)
         return x
 
