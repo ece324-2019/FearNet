@@ -13,3 +13,5 @@ Resnet152 (1 unfrozen fc layer + 1 external fc layer): ~75%
 Resnet152 (1 unfrozen fc layer + 2 external fc layers): ~75%  
 VGG19_BN (1 unfrozen fc layer): ~73%  
 VGG19_BN (1 unfrozen fc layer + 1 external fc layer): ~73-74%  
+Densenet161 (1 unfrozen fc layer): 75%
+Densenet161 (1 unfrozen fc layer + 1 external fc layer): ~75-76%
