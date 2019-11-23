@@ -19,7 +19,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 from PIL import Image
 from dataclass import DataClass
-from models import Baseline, DCNNEnsemble_3, resnet152, avgTransferEnsemble
+from models import Baseline, DCNNEnsemble_3, resnet152, avgTransferEnsemble, vgg19bn, dense161, inceptionv3
 from metrics import accuracy, evaluate
 # --- CALCULATING IMAGE CHANNEL MEANS AND STANDARD DEVIATIONS---
 # transform = transforms.Compose([transforms.ToTensor()])
@@ -52,6 +52,7 @@ from metrics import accuracy, evaluate
 # Ch3Mean = Ch3Mean/len(AllImages)
 # Ch3SD = Ch3SD/len(AllImages)
 # print('Ch1',Ch1SD,'Ch2',Ch2SD,'Ch3',Ch3SD)
+net = inceptionv3()
 torch.cuda.empty_cache()
 # print(Ch1Mean, "\n", Ch1SD, "\n", Ch2Mean, "\n", Ch2SD, "\n", Ch3Mean, "\n", Ch3SD)
 Ch1Mean = 0.4882
@@ -105,7 +106,9 @@ valloader = DataLoader(valid,shuffle=True,batch_size=bs,pin_memory=False)
 torch.manual_seed(1)
 # net = Baseline(1)
 # net = DCNNEnsemble_3()
-net = resnet152()
+# net = resnet152()
+# net = dense161()
+net = inceptionv3()
 # net = avgTransferEnsemble()
 net = net.train()
 # summary(net,(3,56,56))
@@ -161,6 +164,8 @@ for epoch in range(e_num):
 print('Finished Training')
 print('Train Acc: ', train_acc_tot)
 print('Val Acc: ', val_acc_tot)
+print('Train Loss: ', loss_tot)
+print('Valid Loss: ', val_loss_tot)
 # print('Time Elapsed: ', end - start, 's')
 plt.plot(n_tot, train_acc_tot, label='Training Accuracy')
 plt.plot(n_tot, val_acc_tot, label='Validation Accuracy')

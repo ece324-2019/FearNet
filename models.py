@@ -95,11 +95,70 @@ class resnet152(nn.Module):
         num_ftrs = self.model.fc.in_features
         print(num_ftrs)
         self.model.fc = nn.Linear(num_ftrs,1024)
-        self.fc2 = nn.Linear(1024,18)
+        self.fc2 = nn.Linear(1024,512)
+        self.fc3 = nn.Linear(512,18)
 
     def forward(self,x):
-        x = self.fc2(self.model(x))
+        x = F.relu(self.model(x))
+        x = F.relu(self.fc2(x))
+        x = self.fc3(x)
         return x
+
+class vgg19bn(nn.Module):
+    def __init__(self):
+        super(vgg19bn, self).__init__()
+        self.model = models.vgg19_bn(pretrained=True)
+        for param in self.model.parameters():
+            param.requires_grad = False
+        num_ftrs = self.model.classifier[6].in_features
+        old = list(self.model.classifier.children())
+        old.pop()
+        old.append(nn.Linear(num_ftrs,2048))
+        self.model.classifier = nn.Sequential(*old)
+        self.fc2 = nn.Linear(2048,18)
+        # self.fc3 = nn.Linear(1024,18)
+
+    def forward(self,x):
+        x = F.relu(self.model(x))
+        x = self.fc2(x)
+        # x = self.fc3(x)
+        return x
+
+class dense161(nn.Module):
+    def __init__(self):
+        super(dense161, self).__init__()
+        self.model = models.densenet161(pretrained=True)
+        for param in self.model.parameters():
+            param.requires_grad = False
+        num_ftrs = self.model.classifier.in_features
+        self.model.classifier = nn.Linear(num_ftrs,1104)
+        self.fc2 = nn.Linear(1104, 18)
+        # self.fc3 = nn.Linear(552,18)
+
+    def forward(self, x):
+        x = F.relu(self.model(x))
+        x = self.fc2(x)
+        # x = self.fc3(x)
+        return x
+
+
+class inceptionv3(nn.Module):
+    def __init__(self):
+        super(inceptionv3, self).__init__()
+        self.model = models.inception_v3(pretrained=True)
+        for param in self.model.parameters():
+            param.requires_grad = False
+        num_ftrs = self.model.fc.in_features
+        self.model.fc = nn.Linear(num_ftrs,18)
+        # self.fc2 = nn.Linear(1024,512)
+        # self.fc3 = nn.Linear(512,18)
+
+    def forward(self,x):
+        x = F.relu(self.model(x))
+        # x = F.relu(self.fc2(x))
+        # x = self.fc3(x)
+        return x
+
 
 class avgTransferEnsemble(nn.Module):
     def __init__(self):
@@ -126,7 +185,6 @@ class avgTransferEnsemble(nn.Module):
         features = list(self.vgg19bn.classifier.children())[:-1]
         # Add the last layer based on the num of classes in our dataset
         features.extend([nn.Linear(n2, 18)])
-        # convert it into container and add it to our model class.
         # Replacing last fc layer for all transfer models
         self.res152.fc = nn.Linear(n1, 18)
         self.vgg19bn = nn.Sequential(*features)
