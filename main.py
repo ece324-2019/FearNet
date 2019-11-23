@@ -52,7 +52,6 @@ from metrics import accuracy, evaluate
 # Ch3Mean = Ch3Mean/len(AllImages)
 # Ch3SD = Ch3SD/len(AllImages)
 # print('Ch1',Ch1SD,'Ch2',Ch2SD,'Ch3',Ch3SD)
-net = resnext101()
 torch.cuda.empty_cache()
 # print(Ch1Mean, "\n", Ch1SD, "\n", Ch2Mean, "\n", Ch2SD, "\n", Ch3Mean, "\n", Ch3SD)
 Ch1Mean = 0.4882
