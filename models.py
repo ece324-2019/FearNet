@@ -134,11 +134,11 @@ class alex(nn.Module):
         num_ftrs = self.model.classifier[6].in_features
         old = list(self.model.classifier.children())
         old.pop()
-        old.append(nn.Linear(num_ftrs,1024))
+        old.append(nn.Linear(num_ftrs,2048))
         print(num_ftrs)
         self.model.classifier = nn.Sequential(*old)
-        self.fc2 = nn.Linear(1024,18)
-        self.bn = nn.BatchNorm1d(1024)
+        self.fc2 = nn.Linear(2048,18)
+        self.bn = nn.BatchNorm1d(2048)
         self.bn2 = nn.BatchNorm1d(18)
 
     def forward(self,x):
