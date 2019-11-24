@@ -265,9 +265,9 @@ class shuffle(nn.Module):
 #         # x = self.fc3(x)
 #         return x
 
-class test(nn.Module):
+class testnet(nn.Module):
     def __init__(self):
-        super(test, self).__init__()
+        super(testnet, self).__init__()
         self.model = dense161()
 
     def forward(self,x):

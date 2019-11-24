@@ -19,7 +19,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 from PIL import Image
 from dataclass import DataClass
-from models import Baseline, DCNNEnsemble_3, resnet152, TransferEnsemble, vgg19bn, dense161, resnext101, wres101, alex, google, shuffle, test
+from models import Baseline, DCNNEnsemble_3, resnet152, TransferEnsemble, vgg19bn, dense161, resnext101, wres101, alex, google, shuffle, testnet
 from metrics import accuracy, evaluate
 # --- CALCULATING IMAGE CHANNEL MEANS AND STANDARD DEVIATIONS---
 # transform = transforms.Compose([transforms.ToTensor()])
@@ -115,7 +115,7 @@ torch.manual_seed(1)
 # net = alex()
 # net = google()
 # net = shuffle()
-net = test()
+net = testnet()
 net = net.train()
 # summary(net,(3,56,56))
 criterion = nn.CrossEntropyLoss()
