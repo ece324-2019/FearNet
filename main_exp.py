@@ -103,15 +103,16 @@ valloader = DataLoader(valid,shuffle=True,batch_size=bs,pin_memory=False)
 
 
 torch.manual_seed(1)
-net_arr = [resnet152(),vgg19bn,dense161(),alex(),resnext101(),google(),wres101(),shuffle()]
-# net1 = resnet152()
-# net2 = vgg19bn()
-# net3 = dense161()
-# net4 = alex()
-# net5 = resnext101()
-# net6 = google()
-# net7 = wres101()
-# net8 = shuffle()
+net1 = resnet152()
+net2 = vgg19bn()
+net3 = dense161()
+net4 = alex()
+net5 = resnext101()
+net6 = google()
+net7 = wres101()
+net8 = shuffle()
+net_arr = [net1,net2,net3,net4,net5,net6,net7,net8]
+
 optimizer_arr = []
 for i in range(0,len(net_arr)):
     optimizer_arr.append(optim.Adam(net_arr[i].parameters(),lr=0.001))
