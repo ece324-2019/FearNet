@@ -1,3 +1,6 @@
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+
 def startup():
     AllPhobias = ["Heights","Open Spaces","Spiders","Lightning","Loneliness","Cancer","Confined Spaces","Clowns","Dogs","Vomit","Blood","Water","Bacteria","Snakes","Birds","Death","Needle","Irregular patterns of holes"]
     ApplicablePhobias = []
@@ -24,9 +27,9 @@ def AskUser(im,phobias):
     print("Would you like to view it anyway? Answer yes/no")
     answer = input()
     if answer.lower() == "yes":
-        im.show()
+        plt.imshow(mpimg.imread(im))
+        plt.show()
     elif answer.lower() == "no":
         print("This image has been blocked as per your request")
     else:
         print("We couldn't understand your answer. Please try again.")
-    
