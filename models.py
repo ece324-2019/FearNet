@@ -317,9 +317,10 @@ class TransferEnsembleFrozen(nn.Module):
         for model in self.marray:
             for param in model.parameters():
                 param.requires_grad = False
-        self.fc1 = nn.Linear(144,18)
-        self.bn1 = nn.BatchNorm1d(18)
-        # self.bn1 = nn.BatchNorm1d(74)
+        self.fc1 = nn.Linear(144,74)
+        self.fc2 = nn.Linear(74,18)
+        self.bn2 = nn.BatchNorm1d(18)
+        self.bn1 = nn.BatchNorm1d(74)
 
     def forward(self,x):
         x1 = self.marray[0](x)
@@ -331,5 +332,6 @@ class TransferEnsembleFrozen(nn.Module):
         x7 = self.marray[6](x)
         x8 = self.marray[7](x)
         z = torch.cat((x1,x2,x3,x4,x5,x6,x7,x8),1)
-        z = self.bn1(self.fc1(z))
+        z = F.relu(self.bn1(self.fc1(z)))
+        z = self.bn2(self.fc2(z))
         return z
