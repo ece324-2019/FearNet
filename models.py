@@ -95,13 +95,14 @@ class resnet152(nn.Module):
         num_ftrs = self.model.fc.in_features
         print(num_ftrs)
         self.model.fc = nn.Linear(num_ftrs,1024)
-        self.fc2 = nn.Linear(1024,512)
-        self.fc3 = nn.Linear(512,18)
+        self.fc2 = nn.Linear(1024,18)
+        self.bn = nn.BatchNorm1d(1024)
+        self.bn2 = nn.BatchNorm1d(18)
+        # self.fc3 = nn.Linear(512,18)
 
     def forward(self,x):
-        x = F.relu(self.model(x))
-        x = F.relu(self.fc2(x))
-        x = self.fc3(x)
+        x = F.relu(self.bn(self.model(x)))
+        x = self.bn2(self.fc2(x))
         return x
 
 class vgg19bn(nn.Module):
@@ -113,14 +114,16 @@ class vgg19bn(nn.Module):
         num_ftrs = self.model.classifier[6].in_features
         old = list(self.model.classifier.children())
         old.pop()
-        old.append(nn.Linear(num_ftrs,18))
+        old.append(nn.Linear(num_ftrs,2048))
         self.model.classifier = nn.Sequential(*old)
-        # self.fc2 = nn.Linear(2048,18)
+        self.fc2 = nn.Linear(2048,18)
+        self.bn = nn.BatchNorm1d(2048)
+        self.bn2 = nn.BatchNorm1d(18)
         # self.fc3 = nn.Linear(1024,18)
 
     def forward(self,x):
-        x = self.model(x)
-        # x = F.relu(self.model(x))
+        x = F.relu(self.bn(self.model(x)))
+        x = self.bn2(self.fc2(x))
         # x = self.fc2(x)
         # x = self.fc3(x)
         return x
@@ -176,13 +179,15 @@ class resnext101(nn.Module):
         for param in self.model.parameters():
             param.requires_grad = False
         num_ftrs = self.model.fc.in_features
-        print(num_ftrs)
         self.model.fc = nn.Linear(num_ftrs,1024)
         self.fc2 = nn.Linear(1024, 18)
-        # self.fc3 = nn.Linear(512, 18)
-        # self.bn1 = nn.BatchNorm1d(1024)
-        # self.bn2 = nn.BatchNorm1d(512)
-        # self.bn3 = nn.BatchNorm1d(18)
+        self.bn = nn.BatchNorm1d(1024)
+        self.bn2 = nn.BatchNorm1d(18)
+
+    def forward(self,x):
+        x = F.relu(self.bn(self.model(x)))
+        x = self.bn2(self.fc2(x))
+        return x
 
 class google(nn.Module):
     def __init__(self):
@@ -191,7 +196,6 @@ class google(nn.Module):
         for param in self.model.parameters():
             param.requires_grad = False
         num_ftrs = self.model.fc.in_features
-        print(num_ftrs)
         self.model.fc = nn.Linear(num_ftrs, 512)
         self.fc2 = nn.Linear(512, 18)
         self.bn = nn.BatchNorm1d(512)
@@ -212,7 +216,6 @@ class wres101(nn.Module):
         for param in self.model.parameters():
             param.requires_grad = False
         num_ftrs = self.model.fc.in_features
-        print(num_ftrs)
         self.model.fc = nn.Linear(num_ftrs,1024)
         self.fc2 = nn.Linear(1024,18)
         self.bn = nn.BatchNorm1d(1024)
@@ -230,7 +233,6 @@ class shuffle(nn.Module):
         for param in self.model.parameters():
             param.requires_grad = False
         num_ftrs = self.model.fc.in_features
-        print(num_ftrs)
         self.model.fc = nn.Linear(num_ftrs, 512)
         self.fc2 = nn.Linear(512, 18)
         self.bn = nn.BatchNorm1d(512)
@@ -265,60 +267,27 @@ class shuffle(nn.Module):
 #         # x = self.fc3(x)
 #         return x
 
-class testnet(nn.Module):
-    def __init__(self):
-        super(testnet, self).__init__()
-        self.model1 = dense161()
-        self.model2 = dense161()
-
-    def forward(self,x):
-        y = self.model1(x)
-        z = self.model2(x)
-        print('y',y.size())
-        print('z',z.size())
-        x = torch.cat((y,z),1)
-        print('x',x.size())
-        return x
-
-
 class TransferEnsemble(nn.Module):
     def __init__(self):
         super(TransferEnsemble, self).__init__()
-        self.res152 = models.resnet152(pretrained=True)
-        self.vgg19bn = models.vgg19_bn(pretrained=True)
-        self.dense161 = models.densenet161(pretrained=True)
-        self.wres101 = models.wide_resnet101_2(pretrained=True)
-        self.resnext101 = models.resnext101_32x8d(pretrained=True)
-
-        # Freezing
-
-        # Finding size of last layer
-        n1 = self.res152.fc.in_features
-        n2 = self.vgg19bn.classifier[6].in_features
-        n3 = self.dense161.fc.in_features
-        n5 = self.wres101.fc.in_features
-        n6 = self.resnext101.fc.in_features
-
-        # Some syntax to prep vgg19_bn for last fc layer replacement
-        # Convert all vgg19_bn layers to list and remove last one
-        features = list(self.vgg19bn.classifier.children())[:-1]
-        # Add the last layer based on the num of classes in our dataset
-        features.extend([nn.Linear(n2, 18)])
-        # Replacing last fc layer for all transfer models
-        self.res152.fc = nn.Linear(n1, 18)
-        self.vgg19bn = nn.Sequential(*features)
-        self.dense161.fc = nn.Linear(n3, 18)
-        self.inceptv3.fc = nn.Linear(n4, 18)
-        self.wres101.fc = nn.Linear(n5, 18)
-        self.resnext50.fc = nn.Linear(n6, 18)
+        self.res152 = resnet152()
+        self.vgg19bn = vgg19bn()
+        self.dense161 = dense161()
+        self.alex = alex()
+        self.resnext101 = resnext101()
+        self.google = google()
+        self.wres101 = wres101()
+        self.shuffle = shuffle()
 
     def forward(self,x):
         x1 = self.res152(x)
         x2 = self.vgg19bn(x)
         x3 = self.dense161(x)
-        x4 = self.inceptv3(x)
-        x5 = self.wres101(x)
-        x6 = self.resnext50(x)
+        x4 = self.alex(x)
+        x5 = self.resnext101(x)
+        x6 = self.google(x)
+        x7 = self.wres101(x)
+        x8 = self.shuffle(x)
 
-        z = (x1+x2+x3+x4+x5+x6)/6
+        z = (x1+x2+x3+x4+x5+x6+x7+x8)/8
         return z
