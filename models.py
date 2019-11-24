@@ -279,8 +279,11 @@ class TransferEnsemble(nn.Module):
         self.wres101 = wres101()
         self.shuffle = shuffle()
 
-        self.fc1 = nn.Linear(144,18)
-        self.bn1 = nn.BatchNorm1d(18)
+        self.fc1 = nn.Linear(144,72)
+        self.fc2 = nn.Linear(72,18)
+        self.bn1 = nn.BatchNorm1d(72)
+        self.bn2 = nn.BatchNorm1d(18)
+
 
     def forward(self,x):
         # x1 = self.res152(x)
@@ -302,6 +305,7 @@ class TransferEnsemble(nn.Module):
         x8 = F.relu(self.shuffle(x))
 
         z = torch.cat((x1,x2,x3,x4,x5,x6,x7,x8),1)
-        z = self.bn1(self.fc1(z))
+        z = F.relu(self.bn1(self.fc1(z)))
+        z = self.bn2(self.fc2(z))
         # z = (x1+x2+x3+x4+x5+x6+x7+x8)/8
         return z
