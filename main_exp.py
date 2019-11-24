@@ -190,6 +190,7 @@ for tloopnum in range(len(net_arr)):
     torch.save(net, 'model%d.pt'%tloopnum)
 # Now, all transfer models have been finetuned for our problem.
 # Using these, we will attempt to assemble
+net0 = torch.load('model0.pt')
 net1 = torch.load('model1.pt')
 net2 = torch.load('model2.pt')
 net3 = torch.load('model3.pt')
@@ -197,10 +198,9 @@ net4 = torch.load('model4.pt')
 net5 = torch.load('model5.pt')
 net6 = torch.load('model6.pt')
 net7 = torch.load('model7.pt')
-net8 = torch.load('model8.pt')
 
-net = TransferEnsembleFrozen(net1,net2,net3,net4,net5,net6,net7,net8)
-optimizer = optim.Adam(TransferEnsembleFrozen.parameters(),lr=0.001)
+net = TransferEnsembleFrozen(net0,net1,net2,net3,net4,net5,net6,net7)
+optimizer = optim.Adam(net.parameters(),lr=0.001)
 
 val_acc_tot = []
 train_acc_tot = []
