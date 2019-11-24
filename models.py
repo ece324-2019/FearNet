@@ -309,3 +309,27 @@ class TransferEnsemble(nn.Module):
         z = self.bn2(self.fc2(z))
         # z = (x1+x2+x3+x4+x5+x6+x7+x8)/8
         return z
+
+class TransferEnsembleFrozen(nn.Module):
+    def __init__(self, m1, m2, m3, m4, m5, m6, m7, m8):
+        super(TransferEnsembleFrozen,self).__init__()
+        self.marray = [m1,m2,m3,m4,m5,m6,m7,m8]
+        for model in self.marray:
+            for param in model.parameters():
+                param.requires_grad = False
+        self.fc1 = nn.Linear(144,18)
+        self.bn1 = nn.BatchNorm1d(18)
+        # self.bn1 = nn.BatchNorm1d(74)
+
+    def forward(self,x):
+        x1 = self.marray[0](x)
+        x2 = self.marray[1](x)
+        x3 = self.marray[2](x)
+        x4 = self.marray[3](x)
+        x5 = self.marray[4](x)
+        x6 = self.marray[5](x)
+        x7 = self.marray[6](x)
+        x8 = self.marray[7](x)
+        z = torch.cat((x1,x2,x3,x4,x5,x6,x7,x8),1)
+        z = self.bn1(self.fc1(z))
+        return z
