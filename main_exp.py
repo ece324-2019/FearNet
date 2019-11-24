@@ -171,7 +171,11 @@ for tloopnum in range(len(net_arr)):
         print('Validation Acc: ', temp[0])
         print('Train Loss: ', running_loss/batchperepoch)
         print('Validation Loss: ', temp[1])
-
+    print('Finished Training')
+    print('Train Acc: ', train_acc_tot)
+    print('Val Acc: ', val_acc_tot)
+    print('Train Loss: ', loss_tot)
+    print('Valid Loss: ', val_loss_tot)
     y_ground = []
     y_pred = []
     for j, batch in enumerate(valloader, 1):
@@ -248,7 +252,11 @@ for epoch in range(e_num):
     print('Validation Acc: ', temp[0])
     print('Train Loss: ', running_loss / batchperepoch)
     print('Validation Loss: ', temp[1])
-
+print('Finished Training')
+print('Train Acc: ', train_acc_tot)
+print('Val Acc: ', val_acc_tot)
+print('Train Loss: ', loss_tot)
+print('Valid Loss: ', val_loss_tot)
 y_ground = []
 y_pred = []
 for j, batch in enumerate(valloader, 1):
