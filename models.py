@@ -242,6 +242,30 @@ class shuffle(nn.Module):
         # x = self.model(x)
         return x
 
+class squeeze(nn.Module):
+    def __init__(self):
+        super(squeeze, self).__init__()
+        self.model = models.squeezenet1_1(pretrained=True)
+        for param in self.model.parameters():
+            param.requires_grad = False
+        # num_ftrs = self.model.fc.in_features
+        old = list(self.model.classifier.children())
+        old.pop()
+        old.append(nn.Linear(1000,18))
+        # print(num_ftrs)
+        self.model.classifier = nn.Sequential(*old)
+        # self.fc2 = nn.Linear(2048,18)
+        # self.bn = nn.BatchNorm1d(2048)
+        # self.bn2 = nn.BatchNorm1d(18)
+
+    def forward(self,x):
+        x = self.model(x)
+        # x = F.relu(self.bn(self.model(x)))
+        # x = self.bn2(self.fc2(x))
+        # x = self.fc3(x)
+        return x
+
+
 class avgTransferEnsemble(nn.Module):
     def __init__(self):
         super(avgTransferEnsemble, self).__init__()
