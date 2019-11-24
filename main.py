@@ -132,6 +132,7 @@ for epoch in range(e_num):
     net = net.train()
     sum_loss = 0
     running_loss = 0
+    running_acc = 0
     batchperepoch = 0
     for i, data in enumerate(trainloader,0):
         batchperepoch += 1
@@ -147,13 +148,15 @@ for epoch in range(e_num):
         loss.backward()
         optimizer.step()
         running_loss += loss.detach()
+        running_acc += accuracy(outputs, labels)[0]
 
     # if j%step== 0:
     # if epoch%1 == epoch:
     net = net.eval()
     print(running_loss/batchperepoch)
     loss_tot.append(running_loss/batchperepoch)
-    t_acc = accuracy(outputs,labels)[0]
+    # t_acc = accuracy(outputs,labels)[0]
+    t_acc = running_acc/batchperepoch
     train_acc_tot.append(t_acc)
     # acc_tot.append(acc[0])
     n_tot.append(epoch)
