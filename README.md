@@ -39,4 +39,3 @@ Wres101 (1 unfrozen fc layer + 1 ext. fc layer): ~77%
 Alexnet (1 unfrozen fc layer + 1 ext. fc layer): ~73-74%    
 Googlenet (1 unfrozen fc layer + 1 ext. fc layer): ~73%     
 Shufflenet (1 unfrozen fc layer + 1 ext. fc layer): ~75% (was 77 up to 50 epochs)      
-Squeezenet
