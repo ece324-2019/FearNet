@@ -231,16 +231,15 @@ class shuffle(nn.Module):
             param.requires_grad = False
         num_ftrs = self.model.fc.in_features
         print(num_ftrs)
-        self.model.fc = nn.Linear(num_ftrs, 18)
-        # self.fc2 = nn.Linear(512, 18)
-        # self.bn = nn.BatchNorm1d(512)
-        # self.bn2 = nn.BatchNorm1d(18)
+        self.model.fc = nn.Linear(num_ftrs, 512)
+        self.fc2 = nn.Linear(512, 18)
+        self.bn = nn.BatchNorm1d(512)
+        self.bn2 = nn.BatchNorm1d(18)
 
     def forward(self,x):
-        # x = F.relu(self.bn(self.model(x)))
-        # x = self.bn2(self.fc2(x))
-        # x = self.bn2(self.fc2(x))
-        x = self.model(x)
+        x = F.relu(self.bn(self.model(x)))
+        x = self.bn2(self.fc2(x))
+        # x = self.model(x)
         return x
 
 class avgTransferEnsemble(nn.Module):
