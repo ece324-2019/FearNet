@@ -19,7 +19,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 from PIL import Image
 from dataclass import DataClass
-from models import Baseline, DCNNEnsemble_3, resnet152, avgTransferEnsemble, vgg19bn, dense161, resnext101, wres101, alex, google, shuffle, squeeze
+from models import Baseline, DCNNEnsemble_3, resnet152, TransferEnsemble, vgg19bn, dense161, resnext101, wres101, alex, google, shuffle, test
 from metrics import accuracy, evaluate
 # --- CALCULATING IMAGE CHANNEL MEANS AND STANDARD DEVIATIONS---
 # transform = transforms.Compose([transforms.ToTensor()])
@@ -52,6 +52,7 @@ from metrics import accuracy, evaluate
 # Ch3Mean = Ch3Mean/len(AllImages)
 # Ch3SD = Ch3SD/len(AllImages)
 # print('Ch1',Ch1SD,'Ch2',Ch2SD,'Ch3',Ch3SD)
+net = test()
 torch.cuda.empty_cache()
 # print(Ch1Mean, "\n", Ch1SD, "\n", Ch2Mean, "\n", Ch2SD, "\n", Ch3Mean, "\n", Ch3SD)
 Ch1Mean = 0.4882
@@ -108,12 +109,13 @@ torch.manual_seed(1)
 # net = resnet152()
 # net = dense161()
 # net = vgg19bn()
-# net = avgTransferEnsemble()
+# net = TransferEnsemble()
 # net = resnext101()
 # net = wres101()
 # net = alex()
 # net = google()
-net = squeeze()
+# net = shuffle()
+net = test()
 net = net.train()
 # summary(net,(3,56,56))
 criterion = nn.CrossEntropyLoss()
