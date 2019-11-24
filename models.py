@@ -280,7 +280,7 @@ class TransferEnsemble(nn.Module):
         self.shuffle = shuffle()
 
         self.fc1 = nn.Linear(144,18)
-        self.bn1 = nn.Linear(18)
+        self.bn1 = nn.BatchNorm1d(18)
 
     def forward(self,x):
         # x1 = self.res152(x)
