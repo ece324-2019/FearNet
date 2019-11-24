@@ -268,10 +268,16 @@ class shuffle(nn.Module):
 class testnet(nn.Module):
     def __init__(self):
         super(testnet, self).__init__()
-        self.model = dense161()
+        self.model1 = dense161()
+        self.model2 = dense161()
 
     def forward(self,x):
-        x = self.model(x)
+        y = self.model1(x)
+        z = self.model2(x)
+        print('y',y.size())
+        print('z',z.size())
+        x = torch.cat((y,z),1)
+        print('x',x.size())
         return x
 
 
