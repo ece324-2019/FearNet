@@ -33,7 +33,7 @@ class Baseline(nn.Module):
         x = self.pool(F.relu(self.conv_BN(self.conv1(x))))
         x = self.pool(F.relu(self.conv_BN(self.conv2(x))))
 
-        print('post',x.size())
+        # print('post',x.size())
         x = x.view(-1,42050)
         # print(x.size())
         # Fully connected output
