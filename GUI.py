@@ -35,8 +35,8 @@ while True:
 window.close()
 print(ApplicablePhobias)
 
-def AskUser(im,phobia):
-    layout = [[sg.Text("The following potentially disturbing content has been detected in this image:")],[sg.Text(phobia)], [sg.Text("Would you like to view it anyway?")], [sg.Button('Yes'),sg.Button('No')] ]
+def AskUser(im,confidence,phobia):
+    layout = [[sg.Text("This image is predicted to contain the following disturbing content:")],[sg.Text(phobia)], [sg.Text("With probability"),sg.Text(confidence),sg.Text("%. Would you like to view it anyway?")], [sg.Button('Yes'),sg.Button('No')] ]
     window = sg.Window('Select',layout)
     event, values = window.Read()
     if event == "Yes":
@@ -52,7 +52,7 @@ transform = transforms.Compose([transforms.Resize((128,128)),transforms.ToTensor
 image_data = torchvision.datasets.ImageFolder(root='./data',transform=transform)
 
 img_col = os.listdir('./data/AcrophobiaImages')
-sig = nn.Sigmoid()
+sig = nn.Softmax()
 
 for i in range(0,len(img_col)):
     image_file = 'data/AcrophobiaImages/'+img_col[i]
@@ -62,11 +62,9 @@ for i in range(0,len(img_col)):
     output = net(input_img)
     output = sig(output)
     output = output[0]
-    __, index = torch.max(output,0)
-    print(output)
-    print(__)
-    print(index)
+    confidence, index = torch.max(output,0)
+    confidence = confidence.data.item()
     if index < 12 and AllPhobias[index] in ApplicablePhobias:
-        AskUser(image_file,AllPhobias[index])
+        AskUser(image_file,100*confidence,AllPhobias[index])
     elif index > 12 and AllPhobias[index-1] in ApplicablePhobias:
-        AskUser(image_file,AllPhobias[index-1])
+        AskUser(image_file,100*confidence,AllPhobias[index-1])
