@@ -51,11 +51,11 @@ transform = transforms.Compose([transforms.Resize((128,128)),transforms.ToTensor
 
 image_data = torchvision.datasets.ImageFolder(root='./data',transform=transform)
 
-img_col = os.listdir('./data/CoulrophobiaImages')
+img_col = os.listdir('./data/AcrophobiaImages')
 sig = nn.Sigmoid()
 
 for i in range(0,len(img_col)):
-    image_file = 'data/CoulrophobiaImages/'+img_col[i]
+    image_file = 'data/AcrophobiaImages/'+img_col[i]
     input_img = image_loader(transform,image_file)
     if input_img.size()[1] == 1:
         input_img = torch.cat([input_img,input_img,input_img],1)
