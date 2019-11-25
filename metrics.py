@@ -9,6 +9,8 @@ def accuracy(predictions, label):
     total_corr = 0
     index = 0
     for pred in predictions:
+        print(pred)
+        print(nn.Softmax(pred))
         p_val,p_clas = torch.max(nn.Softmax(pred),0)
         v_val,v_clas = torch.max(label[index],0)
         if p_clas.item() == v_clas.item():
