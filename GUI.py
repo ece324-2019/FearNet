@@ -16,7 +16,7 @@ import numpy as np
 from guitest import image_loader
 import os
 
-AllPhobias = ['Heights','Open Spaces','Spiders','Lightning','Loneliness','Confined Spaces','Clowns','Dogs','Skin Defects','Vomit','Blood','Water','Birds','Snakes','Death','Needles','Holes']
+AllPhobias = ['Heights','Open Spaces','Spiders','Lightning','Confined Spaces','Clowns','Dogs','Skin Defects','Vomit','Blood','Water','Birds','Snakes','Death','Needles','Holes']
 ApplicablePhobias = []
 # All the stuff inside your window.
 layout = [  [sg.Text('Please select which of the following phobias apply to you:')],
@@ -51,11 +51,11 @@ transform = transforms.Compose([transforms.Resize((128,128)),transforms.ToTensor
 
 image_data = torchvision.datasets.ImageFolder(root='./data',transform=transform)
 
-img_col = os.listdir('./data/AgoraphobiaImages')
+img_col = os.listdir('./data/CoulrophobiaImages')
 sig = nn.Sigmoid()
 
 for i in range(0,len(img_col)):
-    image_file = 'data/AgoraphobiaImages/'+img_col[i]
+    image_file = 'data/CoulrophobiaImages/'+img_col[i]
     input_img = image_loader(transform,image_file)
     if input_img.size()[1] == 1:
         input_img = torch.cat([input_img,input_img,input_img],1)
@@ -66,7 +66,7 @@ for i in range(0,len(img_col)):
     print(output)
     print(__)
     print(index)
-    if index < 13 and AllPhobias[index] in ApplicablePhobias:
+    if index < 12 and AllPhobias[index] in ApplicablePhobias:
         AskUser(image_file,AllPhobias[index])
-    elif index > 13 and AllPhobias[index-1] in ApplicablePhobias:
+    elif index > 12 and AllPhobias[index-1] in ApplicablePhobias:
         AskUser(image_file,AllPhobias[index-1])
