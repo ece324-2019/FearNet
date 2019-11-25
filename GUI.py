@@ -4,27 +4,14 @@ import matplotlib.image as mpimg
 
 import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader
-import torch.utils.data as data
-
-import torch.optim as optim
 
 import torchvision
-from torchvision import models
 import torchvision.transforms as transforms
 
 #from torchsummary import summary
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix
-from PIL import Image
-from dataclass import DataClass
-from models import Baseline, DCNNEnsemble_3, resnet152, TransferEnsemble, vgg19bn, dense161, resnext101, wres101, alex, google, shuffle
-from metrics import accuracy, evaluate
 
 from guitest import image_loader
 import os
@@ -70,11 +57,12 @@ sig = nn.Sigmoid()
 for i in range(0,len(img_col)):
     image_file = 'data/AcrophobiaImages/'+img_col[i]
     input_img = image_loader(transform,image_file)
-    output = net(input_img)
-    output = sig(output)
-    output = output[0][0]
-    __, index = torch.max(output,0)
-    if index < 13 and AllPhobias[index] in ApplicablePhobias:
-        AskUser(image_file,AllPhobias[index])
-    elif index > 13 and AllPhobias[index-1] in ApplicablePhobias:
-        AskUser(image_file,AllPhobias[index-1])
+    if input_img.size()[1] == 3:
+        output = net(input_img)
+        output = sig(output)
+        output = output[0][0]
+        __, index = torch.max(output,0)
+        if index < 13 and AllPhobias[index] in ApplicablePhobias:
+            AskUser(image_file,AllPhobias[index])
+        elif index > 13 and AllPhobias[index-1] in ApplicablePhobias:
+            AskUser(image_file,AllPhobias[index-1])
