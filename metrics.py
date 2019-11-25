@@ -1,17 +1,13 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 def accuracy(predictions, label):
-    # print(label.size())
-    # sig = nn.Sigmoid()
-    # predictions = sig(predictions)
     predictions = predictions.detach()
     total_corr = 0
     index = 0
     for pred in predictions:
-        print(pred)
-        print(nn.Softmax(pred))
-        p_val,p_clas = torch.max(nn.Softmax(pred),0)
+        p_val,p_clas = torch.max(F.softmax(pred),0)
         v_val,v_clas = torch.max(label[index],0)
         if p_clas.item() == v_clas.item():
             total_corr += 1
