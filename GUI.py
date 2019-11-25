@@ -4,27 +4,17 @@ import matplotlib.image as mpimg
 
 import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader
-import torch.utils.data as data
-
-import torch.optim as optim
 
 import torchvision
-from torchvision import models
 import torchvision.transforms as transforms
 
 #from torchsummary import summary
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix
-from PIL import Image
-from dataclass import DataClass
-from models import Baseline, DCNNEnsemble_3, resnet152, TransferEnsemble, vgg19bn, dense161, resnext101, wres101, alex, google, shuffle
-from metrics import accuracy, evaluate
+
+from guitest import image_loader
+import os
 
 AllPhobias = ['Heights','Open Spaces','Spiders','Lightning','Confined Spaces','Clowns','Dogs','Skin Defects','Vomit','Blood','Water','Birds','Snakes','Death','Needles','Holes']
 ApplicablePhobias = []
@@ -39,13 +29,14 @@ while True:
     event, values = window.Read()
     if event in (None, 'None'):	# if user closes window or clicks cancel
         break
-    ApplicablePhobias += [event]
+    if event not in ApplicablePhobias:
+        ApplicablePhobias += [event]
 
 window.close()
 print(ApplicablePhobias)
 
-def AskUser(im,phobias):
-    layout = [[sg.Text("The following potentially disturbing content has been detected in this image:")],[sg.Text(phobia) for phobia in phobias], [sg.Text("Would you like to view it anyway?")], [sg.Button('Yes'),sg.Button('No')] ]
+def AskUser(im,confidence,phobia):
+    layout = [[sg.Text("This image is predicted to contain the following disturbing content:")],[sg.Text(phobia)], [sg.Text("With probability"),sg.Text(confidence),sg.Text("%. Would you like to view it anyway?")], [sg.Button('Yes'),sg.Button('No')] ]
     window = sg.Window('Select',layout)
     event, values = window.Read()
     if event == "Yes":
@@ -56,28 +47,24 @@ def AskUser(im,phobias):
 
 net = torch.load('ensemble1.pt',map_location=torch.device('cpu'))
 net = net.eval()
-Ch1Mean = 0.4882
-Ch1SD = 2850.2090/12735
-Ch2Mean = 0.4723
-Ch2SD = 2754.8560/12735
-Ch3Mean = 0.4512
-Ch3SD = 2778.6946/12735
-transform = transforms.Compose([transforms.Resize((128,128)),transforms.ToTensor(),transforms.Normalize((Ch1Mean,Ch2Mean,Ch3Mean),(Ch1SD,Ch2SD,Ch3SD))])
+transform = transforms.Compose([transforms.Resize((128,128)),transforms.ToTensor()])
 
 image_data = torchvision.datasets.ImageFolder(root='./data',transform=transform)
 
-img_col = []
-for i in image_data:
-    img_col.append(i[0].numpy())
+img_col = os.listdir('./data/AcrophobiaImages')
+sig = nn.Softmax()
 
 for i in range(0,len(img_col)):
-    print(i)
-    input_img = torch.from_numpy(img_col[i])
-    input_img = input_img.unsqueeze(0)
+    image_file = 'data/AcrophobiaImages/'+img_col[i]
+    input_img = image_loader(transform,image_file)
+    if input_img.size()[1] == 1:
+        input_img = torch.cat([input_img,input_img,input_img],1)
     output = net(input_img)
-    phobias = []
-    for j in range(0,len(output)):
-        if output[j] > 0.5 and AllPhobias[j] in ApplicablePhobias:
-            phobias.append(AllPhobias[j])
-    if phobias != []:
-        AskUser(img_col[i],phobias)
+    output = sig(output)
+    output = output[0]
+    confidence, index = torch.max(output,0)
+    confidence = confidence.data.item()
+    if index < 12 and AllPhobias[index] in ApplicablePhobias:
+        AskUser(image_file,100*confidence,AllPhobias[index])
+    elif index > 12 and AllPhobias[index-1] in ApplicablePhobias:
+        AskUser(image_file,100*confidence,AllPhobias[index-1])
