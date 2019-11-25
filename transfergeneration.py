@@ -153,23 +153,10 @@ for tloopnum in range(len(net_arr)):
             optimizer.step()
             running_loss += loss.detach()
             running_acc += accuracy(outputs, labels)[0]
-            index = 0
-            y_ground = []
-            y_pred = []
-            for pred in outputs:
-                p_val, p_clas = torch.max(pred, 0)
-                v_val, v_clas = torch.max(labels[index], 0)
-                y_pred.append(p_clas.item())
-                y_ground.append(v_clas.item())
-                index += 1
-        f1 = f1_score(y_ground,y_pred)
-        f1_tot.append(f1)
-        recall = recall_score(y_ground,y_pred)
-        recall_tot.append(recall)
+
         # if j%step== 0:
         # if epoch%1 == epoch:
         net = net.eval()
-        print(running_loss/batchperepoch)
         loss_tot.append(running_loss/batchperepoch)
         # t_acc = accuracy(outputs,labels)[0]
         t_acc = running_acc/batchperepoch
@@ -185,8 +172,25 @@ for tloopnum in range(len(net_arr)):
         print('Validation Acc: ', temp[0])
         print('Train Loss: ', running_loss/batchperepoch)
         print('Validation Loss: ', temp[1])
-        print('Recall Score: ',recall)
-        print('F1 Score: ', f1)
+        y_ground = []
+        y_pred = []
+        for j, batch in enumerate(valloader, 1):
+            valid_train, valid_label = batch
+            predict = net(valid_train.float())
+            predictions = predict.detach()
+            index = 0
+            for pred in predictions:
+                p_val, p_clas = torch.max(pred, 0)
+                v_val, v_clas = torch.max(valid_label[index], 0)
+                y_pred.append(p_clas.item())
+                y_ground.append(v_clas.item())
+                index += 1
+        f1 = f1_score(y_ground, y_pred)
+        recall = recall_score(y_ground, y_pred)
+        print('F1 :', f1)
+        print('Recall: ', recall)
+        f1_tot.append(f1)
+        recall_tot.append(recall)
     print('Finished Training')
     print('Train Acc: ', train_acc_tot)
     print('Val Acc: ', val_acc_tot)
