@@ -26,7 +26,10 @@ from dataclass import DataClass
 from models import Baseline, DCNNEnsemble_3, resnet152, TransferEnsemble, vgg19bn, dense161, resnext101, wres101, alex, google, shuffle
 from metrics import accuracy, evaluate
 
-AllPhobias = ['Heights','Open Spaces','Spiders','Lightning','Confined Spaces','Clowns','Dogs','Skin Defects','Vomit','Blood','Water','Birds','Snakes','Death','Needles','Holes']
+from guitest import image_loader
+import os
+
+AllPhobias = ['Heights','Open Spaces','Spiders','Lightning','Loneliness','Confined Spaces','Clowns','Dogs','Skin Defects','Vomit','Blood','Water','Birds','Snakes','Death','Needles','Holes']
 ApplicablePhobias = []
 # All the stuff inside your window.
 layout = [  [sg.Text('Please select which of the following phobias apply to you:')],
@@ -39,13 +42,14 @@ while True:
     event, values = window.Read()
     if event in (None, 'None'):	# if user closes window or clicks cancel
         break
-    ApplicablePhobias += [event]
+    if event not in ApplicablePhobias:
+        ApplicablePhobias += [event]
 
 window.close()
 print(ApplicablePhobias)
 
-def AskUser(im,phobias):
-    layout = [[sg.Text("The following potentially disturbing content has been detected in this image:")],[sg.Text(phobia) for phobia in phobias], [sg.Text("Would you like to view it anyway?")], [sg.Button('Yes'),sg.Button('No')] ]
+def AskUser(im,phobia):
+    layout = [[sg.Text("The following potentially disturbing content has been detected in this image:")],[sg.Text(phobia)], [sg.Text("Would you like to view it anyway?")], [sg.Button('Yes'),sg.Button('No')] ]
     window = sg.Window('Select',layout)
     event, values = window.Read()
     if event == "Yes":
@@ -56,28 +60,21 @@ def AskUser(im,phobias):
 
 net = torch.load('ensemble1.pt',map_location=torch.device('cpu'))
 net = net.eval()
-Ch1Mean = 0.4882
-Ch1SD = 2850.2090/12735
-Ch2Mean = 0.4723
-Ch2SD = 2754.8560/12735
-Ch3Mean = 0.4512
-Ch3SD = 2778.6946/12735
-transform = transforms.Compose([transforms.Resize((128,128)),transforms.ToTensor(),transforms.Normalize((Ch1Mean,Ch2Mean,Ch3Mean),(Ch1SD,Ch2SD,Ch3SD))])
+transform = transforms.Compose([transforms.Resize((128,128)),transforms.ToTensor()])
 
 image_data = torchvision.datasets.ImageFolder(root='./data',transform=transform)
 
-img_col = []
-for i in image_data:
-    img_col.append(i[0].numpy())
+img_col = os.listdir('./data/AcrophobiaImages')
+sig = nn.Sigmoid()
 
 for i in range(0,len(img_col)):
-    print(i)
-    input_img = torch.from_numpy(img_col[i])
-    input_img = input_img.unsqueeze(0)
+    image_file = 'data/AcrophobiaImages/'+img_col[i]
+    input_img = image_loader(transform,image_file)
     output = net(input_img)
-    phobias = []
-    for j in range(0,len(output)):
-        if output[j] > 0.5 and AllPhobias[j] in ApplicablePhobias:
-            phobias.append(AllPhobias[j])
-    if phobias != []:
-        AskUser(img_col[i],phobias)
+    output = sig(output)
+    output = output[0][0]
+    __, index = torch.max(output,0)
+    if index < 13 and AllPhobias[index] in ApplicablePhobias:
+        AskUser(image_file,AllPhobias[index])
+    elif index > 13 and AllPhobias[index-1] in ApplicablePhobias:
+        AskUser(image_file,AllPhobias[index-1])
