@@ -51,18 +51,22 @@ transform = transforms.Compose([transforms.Resize((128,128)),transforms.ToTensor
 
 image_data = torchvision.datasets.ImageFolder(root='./data',transform=transform)
 
-img_col = os.listdir('./data/AcrophobiaImages')
+img_col = os.listdir('./data/AgoraphobiaImages')
 sig = nn.Sigmoid()
 
 for i in range(0,len(img_col)):
-    image_file = 'data/AcrophobiaImages/'+img_col[i]
+    image_file = 'data/AgoraphobiaImages/'+img_col[i]
     input_img = image_loader(transform,image_file)
-    if input_img.size()[1] == 3:
-        output = net(input_img)
-        output = sig(output)
-        output = output[0][0]
-        __, index = torch.max(output,0)
-        if index < 13 and AllPhobias[index] in ApplicablePhobias:
-            AskUser(image_file,AllPhobias[index])
-        elif index > 13 and AllPhobias[index-1] in ApplicablePhobias:
-            AskUser(image_file,AllPhobias[index-1])
+    if input_img.size()[1] == 1:
+        input_img = torch.cat([input_img,input_img,input_img],1)
+    output = net(input_img)
+    output = sig(output)
+    output = output[0]
+    __, index = torch.max(output,0)
+    print(output)
+    print(__)
+    print(index)
+    if index < 13 and AllPhobias[index] in ApplicablePhobias:
+        AskUser(image_file,AllPhobias[index])
+    elif index > 13 and AllPhobias[index-1] in ApplicablePhobias:
+        AskUser(image_file,AllPhobias[index-1])
