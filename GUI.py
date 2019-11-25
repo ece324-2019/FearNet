@@ -73,10 +73,11 @@ for i in image_data:
 for i in range(0,len(img_col)):
     print(i)
     input_img = torch.from_numpy(img_col[i])
+    input_img = input_img.unsqueeze(0)
     output = net(input_img)
     phobias = []
-    for j in range(0,len(outputs[i])):
-        if outputs[i][j] > 0.5 and AllPhobias[j] in ApplicablePhobias:
+    for j in range(0,len(output)):
+        if output[j] > 0.5 and AllPhobias[j] in ApplicablePhobias:
             phobias.append(AllPhobias[j])
     if phobias != []:
         AskUser(img_col[i],phobias)
