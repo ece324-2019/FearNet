@@ -164,3 +164,20 @@ for j, batch in enumerate(valloader, 1):
 
 print(confusion_matrix(y_ground, y_pred))
 
+y_ground = []
+y_pred = []
+for j, batch in enumerate(testloader, 1):
+    valid_train, valid_label = batch
+    predict = net(valid_train.float())
+    predictions = predict.detach()
+    index = 0
+    for pred in predictions:
+        p_val, p_clas = torch.max(pred, 0)
+        v_val, v_clas = torch.max(valid_label[index], 0)
+        y_pred.append(p_clas.item())
+        y_ground.append(v_clas.item())
+        index += 1
+
+print(confusion_matrix(y_ground, y_pred))
+
+
