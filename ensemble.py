@@ -90,8 +90,10 @@ criterion = nn.CrossEntropyLoss()
 
 val_acc_tot = []
 train_acc_tot = []
+test_acc_tot = []
 loss_tot = []
 val_loss_tot = []
+test_loss_tot = []
 n_tot = []
 j = 0
 for epoch in range(e_num):
@@ -128,17 +130,24 @@ for epoch in range(e_num):
     n_tot.append(epoch)
     running_loss = 0
     temp = evaluate(net, valloader)
+    testeval = evaluate(net, testloader)
     val_loss_tot.append(temp[1])
     val_acc_tot.append(temp[0])
+    test_acc_tot.append(testeval[0])
+    test_loss_tot.append(testeval[1])
     print('Train Acc: ', t_acc)
     print('Validation Acc: ', temp[0])
+    print('Testing Acc: ',testeval[0])
     print('Train Loss: ', running_loss / batchperepoch)
     print('Validation Loss: ', temp[1])
+    print('Testing Loss: ', testeval[1])
 print('Finished Training')
 print('Train Acc: ', train_acc_tot)
 print('Val Acc: ', val_acc_tot)
+print('Test Acc: ', test_acc_tot)
 print('Train Loss: ', loss_tot)
 print('Valid Loss: ', val_loss_tot)
+print('Test Loss: ', test_loss_tot)
 y_ground = []
 y_pred = []
 for j, batch in enumerate(valloader, 1):
@@ -154,5 +163,4 @@ for j, batch in enumerate(valloader, 1):
         index += 1
 
 print(confusion_matrix(y_ground, y_pred))
-torch.save(net, 'ensemble1.pt')
 
