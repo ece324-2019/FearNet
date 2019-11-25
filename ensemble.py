@@ -69,6 +69,7 @@ bs = 64
 e_num = 20
 trainloader = DataLoader(train, shuffle=True, batch_size=bs,pin_memory=False)
 valloader = DataLoader(valid,shuffle=True,batch_size=bs,pin_memory=False)
+testloader = DataLoader(test, shuffle=True, batch_size=bs,pin_memory=False)
 
 torch.manual_seed(1)
 
