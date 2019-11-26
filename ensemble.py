@@ -16,7 +16,7 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, f1_score,recall_score
 from PIL import Image
 from dataclass import DataClass
 from models import Baseline, DCNNEnsemble_3, resnet152, TransferEnsemble, vgg19bn, dense161, resnext101, wres101, alex, google, shuffle, TransferEnsembleFrozen
@@ -95,6 +95,8 @@ loss_tot = []
 val_loss_tot = []
 test_loss_tot = []
 n_tot = []
+f1_tot = []
+recall_tot = []
 j = 0
 for epoch in range(e_num):
     net = net.train()
@@ -106,7 +108,7 @@ for epoch in range(e_num):
         batchperepoch += 1
         j += 1
         print('Epoch #: ', epoch)
-        print('Batch #: ', j)
+        print('Batch #: ', batchperepoch)
         inputs, labels = data
         optimizer.zero_grad()
         outputs = net(inputs)
@@ -141,6 +143,25 @@ for epoch in range(e_num):
     print('Train Loss: ', running_loss / batchperepoch)
     print('Validation Loss: ', temp[1])
     print('Testing Loss: ', testeval[1])
+    y_ground = []
+    y_pred = []
+    for j, batch in enumerate(valloader, 1):
+        valid_train, valid_label = batch
+        predict = net(valid_train.float())
+        predictions = predict.detach()
+        index = 0
+        for pred in predictions:
+            p_val, p_clas = torch.max(pred, 0)
+            v_val, v_clas = torch.max(valid_label[index], 0)
+            y_pred.append(p_clas.item())
+            y_ground.append(v_clas.item())
+            index += 1
+    f1 = f1_score(y_ground, y_pred, average='micro')
+    recall = recall_score(y_ground, y_pred, average='micro')
+    print('F1 :', f1)
+    print('Recall: ', recall)
+    f1_tot.append(f1)
+    recall_tot.append(recall)
 print('Finished Training')
 print('Train Acc: ', train_acc_tot)
 print('Val Acc: ', val_acc_tot)
@@ -148,24 +169,11 @@ print('Test Acc: ', test_acc_tot)
 print('Train Loss: ', loss_tot)
 print('Valid Loss: ', val_loss_tot)
 print('Test Loss: ', test_loss_tot)
+print('Recall Score: ', recall_tot)
+print('F1 Score: ', f1_tot)
 y_ground = []
 y_pred = []
-for j, batch in enumerate(valloader, 1):
-    valid_train, valid_label = batch
-    predict = net(valid_train.float())
-    predictions = predict.detach()
-    index = 0
-    for pred in predictions:
-        p_val, p_clas = torch.max(pred, 0)
-        v_val, v_clas = torch.max(valid_label[index], 0)
-        y_pred.append(p_clas.item())
-        y_ground.append(v_clas.item())
-        index += 1
 
-print(confusion_matrix(y_ground, y_pred))
-
-y_ground = []
-y_pred = []
 for j, batch in enumerate(testloader, 1):
     valid_train, valid_label = batch
     predict = net(valid_train.float())
@@ -177,7 +185,9 @@ for j, batch in enumerate(testloader, 1):
         y_pred.append(p_clas.item())
         y_ground.append(v_clas.item())
         index += 1
-
+print('y_ground', y_ground)
+print('y_pred: ', y_pred)
 print(confusion_matrix(y_ground, y_pred))
-
+print('F1 :', f1_score(y_ground, y_pred))
+print('Recall: ', recall_score(y_ground, y_pred))
 
