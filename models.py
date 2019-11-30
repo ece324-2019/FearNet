@@ -318,8 +318,8 @@ class TransferEnsembleFrozen(nn.Module):
             for param in model.parameters():
                 param.requires_grad = False
         self.fc1 = nn.Linear(144,74)
-        self.fc2 = nn.Linear(74,17)
-        self.bn2 = nn.BatchNorm1d(17)
+        self.fc2 = nn.Linear(74,18)
+        self.bn2 = nn.BatchNorm1d(18)
         self.bn1 = nn.BatchNorm1d(74)
 
     def forward(self,x):
