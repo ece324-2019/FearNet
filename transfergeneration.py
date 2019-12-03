@@ -185,8 +185,8 @@ for tloopnum in range(len(net_arr)):
                 y_pred.append(p_clas.item())
                 y_ground.append(v_clas.item())
                 index += 1
-        f1 = f1_score(y_ground, y_pred)
-        recall = recall_score(y_ground, y_pred)
+        f1 = f1_score(y_ground, y_pred, average='micro')
+        recall = recall_score(y_ground, y_pred, average='micro')
         print('F1 :', f1)
         print('Recall: ', recall)
         f1_tot.append(f1)
