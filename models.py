@@ -280,8 +280,8 @@ class TransferEnsemble(nn.Module):
         self.shuffle = shuffle()
 
         self.fc1 = nn.Linear(144,72)
-        self.fc2 = nn.Linear(72,18)
-        self.bn1 = nn.BatchNorm1d(72)
+        self.fc2 = nn.Linear(68,18)
+        self.bn1 = nn.BatchNorm1d(68)
         self.bn2 = nn.BatchNorm1d(18)
 
 
@@ -317,10 +317,10 @@ class TransferEnsembleFrozen(nn.Module):
         for model in self.marray:
             for param in model.parameters():
                 param.requires_grad = False
-        self.fc1 = nn.Linear(144,74)
-        self.fc2 = nn.Linear(74,18)
+        self.fc1 = nn.Linear(136,68)
+        self.fc2 = nn.Linear(68,18)
         self.bn2 = nn.BatchNorm1d(18)
-        self.bn1 = nn.BatchNorm1d(74)
+        self.bn1 = nn.BatchNorm1d(68)
 
     def forward(self,x):
         x1 = self.marray[0](x)
@@ -332,6 +332,28 @@ class TransferEnsembleFrozen(nn.Module):
         x7 = self.marray[6](x)
         x8 = self.marray[7](x)
         z = torch.cat((x1,x2,x3,x4,x5,x6,x7,x8),1)
+        z = F.relu(self.bn1(self.fc1(z)))
+        z = self.bn2(self.fc2(z))
+        return z
+
+class TransferEnsembleFrozenLight(nn.Module):
+    def __init__(self, m1, m2, m3):
+        super(TransferEnsembleFrozenLight,self).__init__()
+        self.marray = [m1,m2,m3]
+        for model in self.marray:
+            for param in model.parameters():
+                param.requires_grad = False
+        self.fc1 = nn.Linear(136,68)
+        self.fc2 = nn.Linear(68,18)
+        self.bn2 = nn.BatchNorm1d(18)
+        self.bn1 = nn.BatchNorm1d(68)
+
+    def forward(self,x):
+        x1 = self.marray[0](x)
+        x2 = self.marray[1](x)
+        x3 = self.marray[2](x)
+
+        z = torch.cat((x1,x2,x3),1)
         z = F.relu(self.bn1(self.fc1(z)))
         z = self.bn2(self.fc2(z))
         return z
